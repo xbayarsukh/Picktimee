@@ -34,6 +34,7 @@ dependencies:
   firebase_core: ^2.25.4 # Replace with latest version
   animated_login: ^1.7.2
   salomon_bottom_bar: ^3.3.2
+  animated_bottom_navigation_bar: ^1.4.0
 
 dev_dependencies:
   flutter_test:
