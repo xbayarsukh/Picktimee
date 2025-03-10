@@ -33,6 +33,7 @@ dependencies:
   firebase_auth: ^4.17.4 # Replace with latest version
   firebase_core: ^2.25.4 # Replace with latest version
   animated_login: ^1.7.2
+  salomon_bottom_bar: ^3.3.2
 
 dev_dependencies:
   flutter_test:
@@ -51,12 +52,3 @@ dev_dependencies:
 # The following section is specific to Flutter packages.
 flutter:
   uses-material-design: true
-
-  assets:
-    - assets/images/logo.gif
-    - assets/images/background_image.jpg
-    - assets/images/en.png
-    - assets/images/facebook.png
-    - assets/images/google.png
-    - assets/images/linkedin.png
-    - assets/images/tr.png
