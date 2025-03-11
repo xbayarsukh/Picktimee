@@ -54,14 +54,15 @@ class _MyHomePageState extends State<MyHomePage> {
           Icons.calendar_month,
           color: Colors.white, // Set the icon color to white
         ),
-        backgroundColor: Color.fromARGB(255, 60, 11, 91),
+        backgroundColor: Color.fromARGB(255, 60, 11, 91), // Purple color
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       bottomNavigationBar: AnimatedBottomNavigationBar.builder(
         itemCount: iconList.length,
         tabBuilder: (int index, bool isActive) {
-          final color =
-              isActive ? Color.fromARGB(255, 60, 11, 91) : Colors.grey;
+          final color = isActive
+              ? Color.fromARGB(255, 60, 11, 91)
+              : Color.fromARGB(255, 255, 255, 255);
           return Icon(
             iconList[index],
             size: 24,
@@ -73,6 +74,8 @@ class _MyHomePageState extends State<MyHomePage> {
         notchSmoothness: NotchSmoothness.verySmoothEdge,
         leftCornerRadius: 32,
         rightCornerRadius: 32,
+        backgroundColor:
+            Color.fromARGB(255, 157, 98, 230), // Purple bottom bar color
         onTap: (index) => setState(() => _bottomNavIndex = index),
       ),
     );

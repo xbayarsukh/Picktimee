@@ -55,7 +55,7 @@ class _ServicePageState extends State<ServicePage> {
           Container(
             height: 150,
             decoration: BoxDecoration(
-              color: Color.fromARGB(255, 60, 11, 91),
+              color: Color.fromARGB(255, 157, 98, 230),
               borderRadius: BorderRadius.only(
                 bottomLeft: Radius.circular(50),
                 bottomRight: Radius.circular(50),
@@ -102,18 +102,18 @@ class _ServicePageState extends State<ServicePage> {
             ),
           ),
           Container(
-            margin: EdgeInsets.all(20),
+            margin: EdgeInsets.fromLTRB(40, 20, 40, 0),
             width: double.infinity,
-            height: 200,
+            height: 160,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(16),
-              boxShadow: [
-                BoxShadow(
-                  color: Color.fromARGB(255, 60, 11, 91),
-                  blurRadius: 10,
-                  offset: Offset(0, 5),
-                ),
-              ],
+              // boxShadow: [
+              //   BoxShadow(
+              //     color: Color.fromARGB(255, 60, 11, 91),
+              //     blurRadius: 10,
+              //     offset: Offset(0, 5),
+              //   ),
+              // ],
               image: DecorationImage(
                 image: AssetImage(sliderImages[_currentIndex]),
                 fit: BoxFit.cover,
@@ -122,7 +122,7 @@ class _ServicePageState extends State<ServicePage> {
           ),
           Expanded(
             child: GridView.builder(
-              padding: EdgeInsets.fromLTRB(20, 20, 20, 40),
+              padding: EdgeInsets.fromLTRB(20, 10, 20, 30),
               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 3,
                 crossAxisSpacing: 16,
@@ -143,7 +143,7 @@ class _ServicePageState extends State<ServicePage> {
                       borderRadius: BorderRadius.circular(15),
                       boxShadow: [
                         BoxShadow(
-                          color: Color.fromARGB(255, 60, 11, 91),
+                          color: Colors.black.withOpacity(0.3),
                           blurRadius: 10,
                           offset: Offset(0, 5),
                         ),
