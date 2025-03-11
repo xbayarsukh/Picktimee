@@ -11,7 +11,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      // home: MyHomePage(title: 'Animated Navigation Bottom Bar'),
+      home: MyHomePage(title: 'Animated Navigation Bottom Bar'),
     );
   }
 }
@@ -41,7 +41,6 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(widget.title)),
       body: _pages[_bottomNavIndex], // Change body based on selected index
       floatingActionButton: FloatingActionButton(
         onPressed: () {
@@ -63,12 +62,18 @@ class _MyHomePageState extends State<MyHomePage> {
         tabBuilder: (int index, bool isActive) {
           final color =
               isActive ? Color.fromARGB(255, 60, 11, 91) : Colors.grey;
-          return Icon(iconList[index], color: color);
+          return Icon(
+            iconList[index],
+            size: 24,
+            color: color,
+          );
         },
         activeIndex: _bottomNavIndex,
-        onTap: (index) => setState(() => _bottomNavIndex = index),
         gapLocation: GapLocation.center,
-        notchSmoothness: NotchSmoothness.softEdge,
+        notchSmoothness: NotchSmoothness.verySmoothEdge,
+        leftCornerRadius: 32,
+        rightCornerRadius: 32,
+        onTap: (index) => setState(() => _bottomNavIndex = index),
       ),
     );
   }

@@ -83,8 +83,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 onPressed: () {
                   if (_formKey.currentState?.validate() ?? false) {
                     // Submit form data
-                    String name = _nameController.text;
-                    String email = _emailController.text;
+                    // String name = _nameController.text;
+                    // String email = _emailController.text;
                     // Perform save operation, such as updating the database or API call
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(content: Text('Profile updated')),
