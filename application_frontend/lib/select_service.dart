@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'select_service.dart'; // Import the select_service.dart file
 
-class BookingPage extends StatelessWidget {
+class SelectServicePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -28,63 +27,42 @@ class BookingPage extends StatelessWidget {
               mainAxisAlignment:
                   MainAxisAlignment.center, // Center the content vertically
               children: [
-                // Title
-                Text(
-                  'Цаг захиалах хэсэгт тавтай морил',
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: Color.fromARGB(255, 135, 43, 192),
-                  ),
-                ),
-                SizedBox(height: 10), // Space between title and paragraph
-                // Paragraph
-                Text(
-                  'Захиалсан цагаа өөрчлөх шаардлагатай бол урьдчилан мэдэгдэнэ үү. Хэрэв таны хүссэн цаг идэвхгүй буюу бүх цаг дууссан бол боломжтой цагийг сонгох. Тухайн үйлчилгээний талаар урьдчилан мэдээлэл авах. Захиалсан цагийнхаа хугацааг алдахгүйгээр ирэх, эсвэл 3-4 цагийн өмнө мэдэгдэх, хожимдвол захиалсан цаг хүчингүй болохыг анхаарна уу.',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: Colors.black,
-                  ),
-                ),
-                Spacer(), // Pushes the buttons to the bottom
+                // Other content or information here
+                Spacer(),
+                // Row for buttons at the bottom
                 Row(
-                  mainAxisAlignment:
-                      MainAxisAlignment.spaceEvenly, // Spaces buttons evenly
+                  mainAxisAlignment: MainAxisAlignment
+                      .spaceEvenly, // Spacing the buttons evenly
                   children: [
                     ElevatedButton(
                       onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) =>
-                                  SelectServicePage()), // Navigate to SelectServicePage
-                        );
+                        Navigator.pop(
+                            context); // Navigate back to the previous page
                       },
                       style: ElevatedButton.styleFrom(
                         minimumSize: Size(60, 40), // Set width and height
                         primary:
                             Colors.white, // Set the background color to white
                       ),
-                      child: Text('Book Now',
+                      child: Text('Back',
                           style: TextStyle(
                               color: Color.fromARGB(255, 135, 43, 192))),
                     ),
                     ElevatedButton(
                       onPressed: () {
-                        Navigator.pop(context); // Close the page
+                        _selectService(context); // Handle service selection
                       },
                       style: ElevatedButton.styleFrom(
-                        minimumSize: Size(20, 40), // Set width and height
+                        minimumSize: Size(60, 40), // Set width and height
                         primary:
                             Colors.white, // Set the background color to white
                       ),
-                      child: Text('Cancel',
+                      child: Text('Select Service',
                           style: TextStyle(
                               color: Color.fromARGB(255, 135, 43, 192))),
                     ),
                   ],
-                )
+                ),
               ],
             ),
           ),
@@ -93,17 +71,17 @@ class BookingPage extends StatelessWidget {
     );
   }
 
-  void _bookService(BuildContext context) {
+  void _selectService(BuildContext context) {
+    // Logic to handle service selection
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        title: Text('Booking Confirmed'),
-        content: Text('Your service has been successfully booked!'),
+        title: Text('Service Selected'),
+        content: Text('You have successfully selected a service!'),
         actions: [
           TextButton(
             onPressed: () {
-              Navigator.pop(context);
-              Navigator.pop(context);
+              Navigator.pop(context); // Close the dialog
             },
             child: Text('OK'),
           ),

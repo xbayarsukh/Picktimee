@@ -1,5 +1,11 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'category/lash.dart'; // Import LashPage
+import 'category/manicure.dart'; // Import ManicurePage
+import 'category/brow.dart'; // Import BrowPage
+import 'category/pedicure.dart'; // Import PedicurePage
+import 'category/skincare.dart'; // Import SkincarePage
+import 'category/piercing.dart'; // Import PiercingPage (new import)
 
 class ServicePage extends StatefulWidget {
   @override
@@ -13,13 +19,16 @@ class _ServicePageState extends State<ServicePage> {
     'assets/images/3.jpg',
   ];
 
-  final List<String> serviceImages = [
-    'assets/images/lash.jpg',
-    'assets/images/manicure.jpg',
-    'assets/images/brow.jpg',
-    'assets/images/pedicure.jpg',
-    'assets/images/skincare.jpg',
-    'assets/images/piercing.jpg',
+  final List<Map<String, String>> services = [
+    {"image": 'assets/images/lash.jpg', "name": "Lash"},
+    {"image": 'assets/images/manicure.jpg', "name": "Manicure"},
+    {"image": 'assets/images/brow.jpg', "name": "Brow"},
+    {"image": 'assets/images/pedicure.jpg', "name": "Pedicure"},
+    {"image": 'assets/images/skincare.jpg', "name": "Skincare"},
+    {
+      "image": 'assets/images/piercing.jpg',
+      "name": "Piercing"
+    }, // Added Piercing
   ];
 
   int _currentIndex = 0;
@@ -55,7 +64,7 @@ class _ServicePageState extends State<ServicePage> {
           Container(
             height: 150,
             decoration: BoxDecoration(
-              color: Color.fromARGB(255, 157, 98, 230),
+              color: Color.fromARGB(255, 218, 175, 249),
               borderRadius: BorderRadius.only(
                 bottomLeft: Radius.circular(50),
                 bottomRight: Radius.circular(50),
@@ -107,13 +116,6 @@ class _ServicePageState extends State<ServicePage> {
             height: 160,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(16),
-              // boxShadow: [
-              //   BoxShadow(
-              //     color: Color.fromARGB(255, 60, 11, 91),
-              //     blurRadius: 10,
-              //     offset: Offset(0, 5),
-              //   ),
-              // ],
               image: DecorationImage(
                 image: AssetImage(sliderImages[_currentIndex]),
                 fit: BoxFit.cover,
@@ -129,11 +131,48 @@ class _ServicePageState extends State<ServicePage> {
                 mainAxisSpacing: 16,
                 childAspectRatio: 1.0,
               ),
-              itemCount: serviceImages.length,
+              itemCount: services.length,
               itemBuilder: (context, index) {
                 return GestureDetector(
                   onTap: () {
-                    print("Image ${index + 1} clicked");
+                    if (services[index]["name"] == "Lash") {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => LashPage()),
+                      );
+                    } else if (services[index]["name"] == "Manicure") {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => ManicurePage()),
+                      );
+                    } else if (services[index]["name"] == "Brow") {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => BrowPage()),
+                      );
+                    } else if (services[index]["name"] == "Pedicure") {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) =>
+                                PedicurePage()), // Navigate to PedicurePage
+                      );
+                    } else if (services[index]["name"] == "Skincare") {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) =>
+                                SkincarePage()), // Navigate to SkincarePage
+                      );
+                    } else if (services[index]["name"] == "Piercing") {
+                      // Added Piercing navigation
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) =>
+                                PiercingPage()), // Navigate to PiercingPage
+                      );
+                    }
                   },
                   child: Container(
                     margin: EdgeInsets.all(20),
@@ -149,7 +188,7 @@ class _ServicePageState extends State<ServicePage> {
                         ),
                       ],
                       image: DecorationImage(
-                        image: AssetImage(serviceImages[index]),
+                        image: AssetImage(services[index]["image"]!),
                         fit: BoxFit.cover,
                       ),
                     ),

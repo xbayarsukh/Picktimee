@@ -11,7 +11,7 @@ class ProfilePage extends StatelessWidget {
           Container(
             height: 250,
             decoration: BoxDecoration(
-              color: Color.fromARGB(255, 157, 98, 230),
+              color: Color.fromARGB(255, 218, 175, 249),
               borderRadius: BorderRadius.only(
                 bottomLeft: Radius.circular(50),
                 bottomRight: Radius.circular(50),
@@ -59,7 +59,7 @@ class ProfilePage extends StatelessWidget {
               child: Container(
                 padding: EdgeInsets.symmetric(vertical: 16, horizontal: 20),
                 decoration: BoxDecoration(
-                  color: Color.fromARGB(255, 205, 171, 229),
+                  color: Colors.white,
                   borderRadius: BorderRadius.circular(20),
                   boxShadow: [
                     BoxShadow(
@@ -72,11 +72,14 @@ class ProfilePage extends StatelessWidget {
                 ),
                 child: Row(
                   children: [
-                    Icon(Icons.person, color: Colors.white),
+                    Icon(Icons.person,
+                        color: Color.fromARGB(255, 218, 175, 249)),
                     SizedBox(width: 16),
                     Text(
                       'Edit Profile',
-                      style: TextStyle(color: Colors.white, fontSize: 16),
+                      style: TextStyle(
+                          color: Color.fromARGB(255, 218, 175, 249),
+                          fontSize: 16),
                     ),
                   ],
                 ),
@@ -93,7 +96,7 @@ class ProfilePage extends StatelessWidget {
               child: Container(
                 padding: EdgeInsets.symmetric(vertical: 16, horizontal: 20),
                 decoration: BoxDecoration(
-                  color: Color.fromARGB(255, 205, 171, 229),
+                  color: Colors.white,
                   borderRadius: BorderRadius.circular(20),
                   boxShadow: [
                     BoxShadow(
@@ -106,11 +109,14 @@ class ProfilePage extends StatelessWidget {
                 ),
                 child: Row(
                   children: [
-                    Icon(Icons.history, color: Colors.white),
+                    Icon(Icons.history,
+                        color: Color.fromARGB(255, 218, 175, 249)),
                     SizedBox(width: 16),
                     Text(
                       'History',
-                      style: TextStyle(color: Colors.white, fontSize: 16),
+                      style: TextStyle(
+                          color: Color.fromARGB(255, 218, 175, 249),
+                          fontSize: 16),
                     ),
                   ],
                 ),
@@ -127,7 +133,7 @@ class ProfilePage extends StatelessWidget {
               child: Container(
                 padding: EdgeInsets.symmetric(vertical: 16, horizontal: 20),
                 decoration: BoxDecoration(
-                  color: Color.fromARGB(255, 205, 171, 229),
+                  color: Colors.white,
                   borderRadius: BorderRadius.circular(20),
                   boxShadow: [
                     BoxShadow(
@@ -140,11 +146,13 @@ class ProfilePage extends StatelessWidget {
                 ),
                 child: Row(
                   children: [
-                    Icon(Icons.settings, color: Colors.white),
+                    Icon(Icons.settings,
+                        color: Color.fromARGB(255, 218, 175, 249)),
                     SizedBox(width: 16),
                     Text(
                       'Settings',
-                      style: TextStyle(color: Colors.white, fontSize: 16),
+                      style:
+                          TextStyle(color: Color.fromARGB(255, 218, 175, 249)),
                     ),
                   ],
                 ),
@@ -161,7 +169,7 @@ class ProfilePage extends StatelessWidget {
               child: Container(
                 padding: EdgeInsets.symmetric(vertical: 16, horizontal: 20),
                 decoration: BoxDecoration(
-                  color: Color.fromARGB(255, 205, 171, 229),
+                  color: Colors.white,
                   borderRadius: BorderRadius.circular(20),
                   boxShadow: [
                     BoxShadow(
@@ -174,11 +182,14 @@ class ProfilePage extends StatelessWidget {
                 ),
                 child: Row(
                   children: [
-                    Icon(Icons.logout, color: Colors.white),
+                    Icon(Icons.logout,
+                        color: Color.fromARGB(255, 218, 175, 249)),
                     SizedBox(width: 16),
                     Text(
                       'Log Out',
-                      style: TextStyle(color: Colors.white, fontSize: 16),
+                      style: TextStyle(
+                          color: Color.fromARGB(255, 218, 175, 249),
+                          fontSize: 16),
                     ),
                   ],
                 ),

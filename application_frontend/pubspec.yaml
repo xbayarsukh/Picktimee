@@ -36,6 +36,7 @@ dependencies:
   salomon_bottom_bar: ^3.3.2
   animated_bottom_navigation_bar: ^1.4.0
   image_picker: ^0.8.5+3
+  flutter_local_notifications: ^16.1.0
 
 dev_dependencies:
   flutter_test:

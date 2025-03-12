@@ -30,76 +30,90 @@ class _EditProfilePageState extends State<EditProfilePage> {
       appBar: AppBar(
         title: Text('Edit Profile'),
         centerTitle: true,
-        backgroundColor: Color.fromARGB(255, 60, 11, 91),
+        backgroundColor: Color.fromARGB(255, 205, 171, 229),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: ListView(
-            children: [
-              Center(
-                child: GestureDetector(
-                  onTap: _pickImage,
-                  child: CircleAvatar(
-                    radius: 60,
-                    backgroundImage: _image == null
-                        ? AssetImage(
-                            'assets/images/profile.jpg') // Default image
-                        : FileImage(_image!) as ImageProvider,
-                  ),
+      body: Column(
+        children: [
+          // Header with border radius
+          Container(
+            height: 150,
+            decoration: BoxDecoration(
+              color: Color.fromARGB(255, 205, 171, 229),
+              borderRadius: BorderRadius.only(
+                bottomLeft: Radius.circular(50),
+                bottomRight: Radius.circular(50),
+              ),
+            ),
+            child: Center(
+              child: GestureDetector(
+                onTap: _pickImage,
+                child: CircleAvatar(
+                  radius: 60,
+                  backgroundImage: _image == null
+                      ? AssetImage('assets/images/profile.jpg') // Default image
+                      : FileImage(_image!) as ImageProvider,
                 ),
               ),
-              SizedBox(height: 16),
-              TextFormField(
-                controller: _nameController,
-                decoration: InputDecoration(
-                  labelText: 'Full Name',
-                  border: OutlineInputBorder(),
-                ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter your name';
-                  }
-                  return null;
-                },
-              ),
-              SizedBox(height: 16),
-              TextFormField(
-                controller: _emailController,
-                decoration: InputDecoration(
-                  labelText: 'Email',
-                  border: OutlineInputBorder(),
-                ),
-                validator: (value) {
-                  if (value == null || value.isEmpty || !value.contains('@')) {
-                    return 'Please enter a valid email address';
-                  }
-                  return null;
-                },
-              ),
-              SizedBox(height: 30),
-              ElevatedButton(
-                onPressed: () {
-                  if (_formKey.currentState?.validate() ?? false) {
-                    // Submit form data
-                    // String name = _nameController.text;
-                    // String email = _emailController.text;
-                    // Perform save operation, such as updating the database or API call
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Profile updated')),
-                    );
-                  }
-                },
-                child: Text('Save Changes'),
-                style: ElevatedButton.styleFrom(
-                  primary: Color.fromARGB(255, 60, 11, 91),
-                  padding: EdgeInsets.symmetric(vertical: 14),
-                ),
-              ),
-            ],
+            ),
           ),
-        ),
+          SizedBox(height: 20),
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Form(
+                key: _formKey,
+                child: ListView(
+                  children: [
+                    TextFormField(
+                      controller: _nameController,
+                      decoration: InputDecoration(
+                        labelText: 'Full Name',
+                        border: OutlineInputBorder(),
+                      ),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter your name';
+                        }
+                        return null;
+                      },
+                    ),
+                    SizedBox(height: 16),
+                    TextFormField(
+                      controller: _emailController,
+                      decoration: InputDecoration(
+                        labelText: 'Email',
+                        border: OutlineInputBorder(),
+                      ),
+                      validator: (value) {
+                        if (value == null ||
+                            value.isEmpty ||
+                            !value.contains('@')) {
+                          return 'Please enter a valid email address';
+                        }
+                        return null;
+                      },
+                    ),
+                    SizedBox(height: 30),
+                    ElevatedButton(
+                      onPressed: () {
+                        if (_formKey.currentState?.validate() ?? false) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text('Profile updated')),
+                          );
+                        }
+                      },
+                      child: Text('Save Changes'),
+                      style: ElevatedButton.styleFrom(
+                        primary: Color.fromARGB(255, 205, 171, 229),
+                        padding: EdgeInsets.symmetric(vertical: 14),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
