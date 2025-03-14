@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'edit_profile.dart';
+import 'login.dart'; // Import LoginPage
 
 class ProfilePage extends StatelessWidget {
   @override
@@ -23,8 +24,7 @@ class ProfilePage extends StatelessWidget {
                 children: [
                   CircleAvatar(
                     radius: 50,
-                    backgroundImage: AssetImage(
-                        'assets/images/1.jpg'), // Add your image here
+                    backgroundImage: AssetImage('assets/images/1.jpg'),
                   ),
                   SizedBox(height: 16),
                   Text(
@@ -47,156 +47,85 @@ class ProfilePage extends StatelessWidget {
             ),
           ),
           SizedBox(height: 30),
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 20),
-            child: GestureDetector(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => EditProfilePage()),
-                );
-              },
-              child: Container(
-                padding: EdgeInsets.symmetric(vertical: 16, horizontal: 20),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(20),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.2),
-                      spreadRadius: 2,
-                      blurRadius: 4,
-                      offset: Offset(0, 2), // Shadow position
-                    ),
-                  ],
-                ),
-                child: Row(
-                  children: [
-                    Icon(Icons.person,
-                        color: Color.fromARGB(255, 218, 175, 249)),
-                    SizedBox(width: 16),
-                    Text(
-                      'Edit Profile',
-                      style: TextStyle(
-                          color: Color.fromARGB(255, 218, 175, 249),
-                          fontSize: 16),
-                    ),
-                  ],
-                ),
-              ),
-            ),
+          _buildProfileOption(
+            context,
+            icon: Icons.person,
+            text: "Edit Profile",
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => EditProfilePage()),
+              );
+            },
           ),
-          SizedBox(height: 10),
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 20),
-            child: GestureDetector(
-              onTap: () {
-                // Handle Settings action
-              },
-              child: Container(
-                padding: EdgeInsets.symmetric(vertical: 16, horizontal: 20),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(20),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.2),
-                      spreadRadius: 2,
-                      blurRadius: 4,
-                      offset: Offset(0, 2), // Shadow position
-                    ),
-                  ],
-                ),
-                child: Row(
-                  children: [
-                    Icon(Icons.history,
-                        color: Color.fromARGB(255, 218, 175, 249)),
-                    SizedBox(width: 16),
-                    Text(
-                      'History',
-                      style: TextStyle(
-                          color: Color.fromARGB(255, 218, 175, 249),
-                          fontSize: 16),
-                    ),
-                  ],
-                ),
-              ),
-            ),
+          _buildProfileOption(
+            context,
+            icon: Icons.history,
+            text: "History",
+            onTap: () {
+              // Handle History action
+            },
           ),
-          SizedBox(height: 10),
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 20),
-            child: GestureDetector(
-              onTap: () {
-                // Handle Settings action
-              },
-              child: Container(
-                padding: EdgeInsets.symmetric(vertical: 16, horizontal: 20),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(20),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.2),
-                      spreadRadius: 2,
-                      blurRadius: 4,
-                      offset: Offset(0, 2), // Shadow position
-                    ),
-                  ],
-                ),
-                child: Row(
-                  children: [
-                    Icon(Icons.settings,
-                        color: Color.fromARGB(255, 218, 175, 249)),
-                    SizedBox(width: 16),
-                    Text(
-                      'Settings',
-                      style:
-                          TextStyle(color: Color.fromARGB(255, 218, 175, 249)),
-                    ),
-                  ],
-                ),
-              ),
-            ),
+          _buildProfileOption(
+            context,
+            icon: Icons.settings,
+            text: "Settings",
+            onTap: () {
+              // Handle Settings action
+            },
           ),
-          SizedBox(height: 10),
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 20),
-            child: GestureDetector(
-              onTap: () {
-                // Handle Log Out action
-              },
-              child: Container(
-                padding: EdgeInsets.symmetric(vertical: 16, horizontal: 20),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(20),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.2),
-                      spreadRadius: 2,
-                      blurRadius: 4,
-                      offset: Offset(0, 2), // Shadow position
-                    ),
-                  ],
-                ),
-                child: Row(
-                  children: [
-                    Icon(Icons.logout,
-                        color: Color.fromARGB(255, 218, 175, 249)),
-                    SizedBox(width: 16),
-                    Text(
-                      'Log Out',
-                      style: TextStyle(
-                          color: Color.fromARGB(255, 218, 175, 249),
-                          fontSize: 16),
-                    ),
-                  ],
-                ),
-              ),
-            ),
+          _buildProfileOption(
+            context,
+            icon: Icons.login,
+            text: "Login",
+            onTap: () {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => LoginPage()),
+              );
+            },
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildProfileOption(BuildContext context,
+      {required IconData icon,
+      required String text,
+      required Function() onTap}) {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+      child: GestureDetector(
+        onTap: onTap,
+        child: Container(
+          padding: EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.2),
+                spreadRadius: 2,
+                blurRadius: 4,
+                offset: Offset(0, 2),
+              ),
+            ],
+          ),
+          child: Row(
+            children: [
+              Icon(icon, color: Color.fromARGB(255, 218, 175, 249)),
+              SizedBox(width: 16),
+              Text(
+                text,
+                style: TextStyle(
+                  color: Color.fromARGB(255, 218, 175, 249),
+                  fontSize: 16,
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

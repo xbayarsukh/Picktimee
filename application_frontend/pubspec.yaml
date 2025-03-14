@@ -37,6 +37,9 @@ dependencies:
   animated_bottom_navigation_bar: ^1.4.0
   image_picker: ^0.8.5+3
   flutter_local_notifications: ^16.1.0
+  http: ^0.13.6
+  shared_preferences: ^2.2.0 # For storing JWT tokens
+  intl: ^0.18.1 # Check for the latest version
 
 dev_dependencies:
   flutter_test:
