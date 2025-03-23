@@ -1,26 +1,11 @@
 import 'package:flutter/material.dart';
 import 'service.dart';
 import 'profile.dart';
-import 'booking.dart'; // Assuming you have a BookingPage widget
+import 'booking.dart';
+import 'login.dart';
 import 'package:animated_bottom_navigation_bar/animated_bottom_navigation_bar.dart';
 
-void main() => runApp(MyApp());
-
-class MyApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: MyHomePage(title: 'Animated Navigation Bottom Bar'),
-    );
-  }
-}
-
 class MyHomePage extends StatefulWidget {
-  final String title;
-
-  MyHomePage({Key? key, required this.title}) : super(key: key);
-
   @override
   _MyHomePageState createState() => _MyHomePageState();
 }
@@ -36,46 +21,36 @@ class _MyHomePageState extends State<MyHomePage> {
   final List<Widget> _pages = [
     ServicePage(),
     ProfilePage(),
+    LoginPage(),
   ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _pages[_bottomNavIndex], // Change body based on selected index
+      body: _pages[_bottomNavIndex],
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          // Navigate to the booking page when FAB is pressed
           Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => BookingPage()),
           );
         },
-        child: Icon(
-          Icons.calendar_month,
-          color: Colors.white, // Set the icon color to white
-        ),
-        backgroundColor: Color.fromARGB(255, 135, 43, 192), // Purple color
+        child: Icon(Icons.calendar_month, color: Colors.white),
+        backgroundColor: Color(0xFF872BC0), // Purple color
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       bottomNavigationBar: AnimatedBottomNavigationBar.builder(
         itemCount: iconList.length,
         tabBuilder: (int index, bool isActive) {
-          final color = isActive
-              ? Color.fromARGB(255, 135, 43, 192)
-              : Color.fromARGB(255, 255, 255, 255);
-          return Icon(
-            iconList[index],
-            size: 24,
-            color: color,
-          );
+          final color = isActive ? Color(0xFF872BC0) : Colors.white;
+          return Icon(iconList[index], size: 24, color: color);
         },
         activeIndex: _bottomNavIndex,
         gapLocation: GapLocation.center,
         notchSmoothness: NotchSmoothness.verySmoothEdge,
         leftCornerRadius: 32,
         rightCornerRadius: 32,
-        backgroundColor:
-            Color.fromARGB(255, 218, 175, 249), // Purple bottom bar color
+        backgroundColor: Color(0xFFDAAFFF), // Purple bottom bar color
         onTap: (index) => setState(() => _bottomNavIndex = index),
       ),
     );

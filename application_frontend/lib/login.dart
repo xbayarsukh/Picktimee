@@ -1,8 +1,8 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'service.dart';
 import 'register.dart';
+import 'service.dart'; // Import the service page
 
 class LoginPage extends StatefulWidget {
   @override
@@ -16,7 +16,8 @@ class _LoginPageState extends State<LoginPage> {
 
   Future<void> _login() async {
     if (_formKey.currentState!.validate()) {
-      String url = "http://127.0.0.1:8000/login/"; // Replace with API URL
+      String url =
+          "http://127.0.0.1:8000/login/"; // Use 10.0.2.2 for localhost in Android emulator
 
       final response = await http.post(
         Uri.parse(url),
@@ -36,6 +37,7 @@ class _LoginPageState extends State<LoginPage> {
           SnackBar(content: Text("Login Successful!")),
         );
 
+        // Navigate to ServicePage after successful login
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => ServicePage()),
@@ -69,6 +71,14 @@ class _LoginPageState extends State<LoginPage> {
                       bottomLeft: Radius.circular(50),
                       bottomRight: Radius.circular(50),
                     ),
+                  ),
+                ),
+                Positioned(
+                  top: 40,
+                  left: 15,
+                  child: IconButton(
+                    icon: Icon(Icons.arrow_back, color: Colors.white, size: 28),
+                    onPressed: () => Navigator.pop(context),
                   ),
                 ),
                 Positioned(

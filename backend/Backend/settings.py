@@ -155,10 +155,8 @@ AUTH_PASSWORD_VALIDATORS = [
 CORS_ALLOW_ALL_ORIGINS = True  # Allow all (for development)
 # OR specify allowed origins
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",
-    "http://localhost:64093",  # Next.js frontend
+    "http://localhost:64529",
     "http://127.0.0.1:8000",  # Django API
-    "http://10.0.2.2:8000",  # Android Emulator
 ]
 
 

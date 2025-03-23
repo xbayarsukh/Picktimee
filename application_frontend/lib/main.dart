@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'bottom_bar.dart'; // Import bottom_bar.dart here
+import 'bottom_bar.dart'; // Import the bottom bar
 
 void main() => runApp(MyApp());
 
@@ -8,7 +8,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: MyHomePage(title: ''), // Use MyHomePage here
+      home: MyHomePage(), // Start with the Login Page
     );
   }
 }

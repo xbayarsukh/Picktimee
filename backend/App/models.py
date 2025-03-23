@@ -69,6 +69,8 @@ class Service(models.Model):
     sname = models.CharField(max_length=255, verbose_name="Service Name")
     sprice = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Service Price")
     sduration = models.CharField(max_length=255, unique=True, verbose_name="Duration")
+    simage = models.ImageField(upload_to='images/', null=True, blank=True, verbose_name="Service Image")
+    scomment = models.TextField(null=True, blank=True, verbose_name="Comment")
 
     class Meta:
         db_table = "t_service"

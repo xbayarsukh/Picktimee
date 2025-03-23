@@ -19,21 +19,25 @@ class _RegisterPageState extends State<RegisterPage> {
   Future<void> _register() async {
     if (_formKey.currentState!.validate()) {
       String url =
-          "http://127.0.0.1:8000/api/register/"; // Replace with your API URL
+          "http://127.0.0.1:8000/register_customer/"; // Update if necessary
 
       final response = await http.post(
         Uri.parse(url),
         headers: {"Content-Type": "application/json"},
         body: jsonEncode({
-          "name": _nameController.text,
+          "username": _nameController.text, // Changed "name" to "username"
           "email": _emailController.text,
           "password": _passwordController.text,
         }),
       );
 
-      if (response.statusCode == 201) {
+      final responseData = jsonDecode(response.body);
+
+      if (response.statusCode == 200) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Registration Successful! Please login.")),
+          SnackBar(
+              content:
+                  Text(responseData['message'] ?? "Registration Successful!")),
         );
         Navigator.pushReplacement(
           context,
@@ -41,7 +45,9 @@ class _RegisterPageState extends State<RegisterPage> {
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Registration failed. Try again.")),
+          SnackBar(
+              content: Text(
+                  responseData['error'] ?? "Registration failed. Try again.")),
         );
       }
     }
@@ -105,7 +111,8 @@ class _RegisterPageState extends State<RegisterPage> {
                     TextFormField(
                       controller: _nameController,
                       decoration: InputDecoration(
-                        labelText: "Full Name",
+                        labelText:
+                            "Username", // Updated from "Full Name" to "Username"
                         prefixIcon:
                             Icon(Icons.person, color: Color(0xFFB266FF)),
                         filled: true,
@@ -116,7 +123,7 @@ class _RegisterPageState extends State<RegisterPage> {
                         ),
                       ),
                       validator: (value) =>
-                          value!.isEmpty ? "Enter your name" : null,
+                          value!.isEmpty ? "Enter your username" : null,
                     ),
                     SizedBox(height: 20),
                     TextFormField(

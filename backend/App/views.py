@@ -11,6 +11,40 @@ from django.db import connection
 from .serializers import CalendarEventSerializer
 from .models import CalendarEvent
 import json
+from django.core.exceptions import ObjectDoesNotExist
+
+# Generate JWT tokens
+def get_tokens_for_user(user):
+    refresh = RefreshToken.for_user(user)
+    return {
+        'refresh': str(refresh),
+        'access': str(refresh.access_token),
+    }
+
+@api_view(['POST'])
+def register_customer(request):
+    username = request.data.get('username')
+    email = request.data.get('email')
+    password = request.data.get('password')
+
+    if User.objects.filter(username=username).exists():
+        return Response({'error': 'Username already exists'}, status=400)
+
+    user = User.objects.create_user(username=username, email=email, password=password)
+    user.save()
+    return Response({'message': 'Customer registered successfully'})
+
+@api_view(['POST'])
+def login_customer(request):
+    username = request.data.get('username')
+    password = request.data.get('password')
+
+    user = authenticate(username=username, password=password)
+    if user is not None:
+        tokens = get_tokens_for_user(user)
+        return Response({'message': 'Login successful', 'tokens': tokens})
+    else:
+        return Response({'error': 'Invalid credentials'}, status=400)
 
 
 # Registration View
@@ -41,6 +75,10 @@ def register_view(request):
     )
     user.save()
     return Response({"message": "User created successfully."}, status=status.HTTP_201_CREATED)
+
+
+##################################################################################################################################################
+
 
 # Login View
 @api_view(['POST'])
