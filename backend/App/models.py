@@ -85,7 +85,7 @@ class Service(models.Model):
     sname = models.CharField(max_length=255, verbose_name="Service Name")
     sprice = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Service Price")
     sduration = models.CharField(max_length=255, unique=True, verbose_name="Duration")
-    simage = models.ImageField(upload_to='images/', null=True, blank=True, verbose_name="Service Image")
+    simage = models.ImageField(upload_to='media/media/meia/images/', null=True, blank=True, verbose_name="Service Image")
     scomment = models.TextField(null=True, blank=True, verbose_name="Comment")
     category = models.ForeignKey(ServiceCategory, on_delete=models.SET_NULL, null=True, blank=True, related_name="services", verbose_name="Category")
 

@@ -14,40 +14,6 @@ import json
 from django.core.exceptions import ObjectDoesNotExist
 from django.conf import settings
 
-# Generate JWT tokens
-def get_tokens_for_user(user):
-    refresh = RefreshToken.for_user(user)
-    return {
-        'refresh': str(refresh),
-        'access': str(refresh.access_token),
-    }
-
-@api_view(['POST'])
-def register_customer(request):
-    username = request.data.get('username')
-    email = request.data.get('email')
-    password = request.data.get('password')
-
-    if User.objects.filter(username=username).exists():
-        return Response({'error': 'Username already exists'}, status=400)
-
-    user = User.objects.create_user(username=username, email=email, password=password)
-    user.save()
-    return Response({'message': 'Customer registered successfully'})
-
-@api_view(['POST'])
-def login_customer(request):
-    username = request.data.get('username')
-    password = request.data.get('password')
-
-    user = authenticate(username=username, password=password)
-    if user is not None:
-        tokens = get_tokens_for_user(user)
-        return Response({'message': 'Login successful', 'tokens': tokens})
-    else:
-        return Response({'error': 'Invalid credentials'}, status=400)
-
-
 # Registration View
 @api_view(['POST'])
 @permission_classes([AllowAny])
@@ -479,8 +445,135 @@ def add_category(request):
 
     return JsonResponse({'error': 'Invalid request method'}, status=400)
 
+#################################################################################################################################################
+
+from django.http import JsonResponse
+from .models import ServiceCategory, Service
+
+def get_lash_services(request):
+    # Corrected to filter by 'cname' instead of 'name'
+    lash_category = ServiceCategory.objects.filter(cname='lash').first()
+    if lash_category:
+        services = Service.objects.filter(category=lash_category)
+        # Prepare the service data
+        service_data = [{"service_id": service.service_id, 
+                         "sname": service.sname, 
+                         "sprice": str(service.sprice), 
+                         "simage": service.simage.url if service.simage else None, 
+                         "sduration": service.sduration} for service in services]
+        
+        # Prepare category data
+        category_data = [{"cname": lash_category.cname}]
+        
+        return JsonResponse({"categories": category_data, "services": service_data})
+    
+    return JsonResponse({"categories": [], "services": []})
+
+
+
+
+def get_brow_services(request):
+    # Corrected to filter by 'cname' for 'brow' instead of 'lash'
+    brow_category = ServiceCategory.objects.filter(cname='brow').first()
+    if brow_category:
+        services = Service.objects.filter(category=brow_category)
+        # Prepare the service data
+        service_data = [{"service_id": service.service_id, 
+                         "sname": service.sname, 
+                         "sprice": str(service.sprice), 
+                         "simage": service.simage.url if service.simage else None, 
+                         "sduration": service.sduration} for service in services]
+        
+        # Prepare category data
+        category_data = [{"cname": brow_category.cname}]
+        
+        return JsonResponse({"categories": category_data, "services": service_data})
+    
+    return JsonResponse({"categories": [], "services": []})
+
+
+def get_manicure_services(request):
+    # Filter by 'cname' for 'manicure'
+    manicure_category = ServiceCategory.objects.filter(cname='manicure').first()
+    if manicure_category:
+        services = Service.objects.filter(category=manicure_category)
+        # Prepare the service data
+        service_data = [{"service_id": service.service_id, 
+                         "sname": service.sname, 
+                         "sprice": str(service.sprice), 
+                         "simage": service.simage.url if service.simage else None, 
+                         "sduration": service.sduration} for service in services]
+        
+        # Prepare category data
+        category_data = [{"cname": manicure_category.cname}]
+        
+        return JsonResponse({"categories": category_data, "services": service_data})
+    
+    return JsonResponse({"categories": [], "services": []})
+
+def get_pedicure_services(request):
+    # Filter by 'cname' for 'pedicure'
+    pedicure_category = ServiceCategory.objects.filter(cname='pedicure').first()
+    if pedicure_category:
+        services = Service.objects.filter(category=pedicure_category)
+        # Prepare the service data
+        service_data = [{"service_id": service.service_id, 
+                         "sname": service.sname, 
+                         "sprice": str(service.sprice), 
+                         "simage": service.simage.url if service.simage else None, 
+                         "sduration": service.sduration} for service in services]
+        
+        # Prepare category data
+        category_data = [{"cname": pedicure_category.cname}]
+        
+        return JsonResponse({"categories": category_data, "services": service_data})
+    
+    return JsonResponse({"categories": [], "services": []})
+
+
+def get_skin_services(request):
+    # Filter by 'cname' for 'skin'
+    skin_category = ServiceCategory.objects.filter(cname='skin').first()
+    if skin_category:
+        services = Service.objects.filter(category=skin_category)
+        # Prepare the service data
+        service_data = [{"service_id": service.service_id, 
+                         "sname": service.sname, 
+                         "sprice": str(service.sprice), 
+                         "simage": service.simage.url if service.simage else None, 
+                         "sduration": service.sduration} for service in services]
+        
+        # Prepare category data
+        category_data = [{"cname": skin_category.cname}]
+        
+        return JsonResponse({"categories": category_data, "services": service_data})
+    
+    return JsonResponse({"categories": [], "services": []})
+
+
+def get_piercing_services(request):
+    # Filter by 'cname' for 'piercing'
+    piercing_category = ServiceCategory.objects.filter(cname='piercing').first()
+    if piercing_category:
+        services = Service.objects.filter(category=piercing_category)
+        # Prepare the service data
+        service_data = [{"service_id": service.service_id, 
+                         "sname": service.sname, 
+                         "sprice": str(service.sprice), 
+                         "simage": service.simage.url if service.simage else None, 
+                         "sduration": service.sduration} for service in services]
+        
+        # Prepare category data
+        category_data = [{"cname": piercing_category.cname}]
+        
+        return JsonResponse({"categories": category_data, "services": service_data})
+    
+    return JsonResponse({"categories": [], "services": []})
+
+
 
 ############################################################################################################################################3
+
 
 def service_list(request):
     if request.method == 'GET':
@@ -532,6 +625,7 @@ def service_list(request):
             return JsonResponse({'error': str(e)}, status=500)
 
     return JsonResponse({'error': 'Invalid request method'}, status=400)
+
 
 
 from .models import ServiceCategory

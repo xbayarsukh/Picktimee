@@ -7,8 +7,6 @@ from django.contrib import admin
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('register_customer/', register_customer, name='register'),
-    path('login_customer/', login_customer, name='login'),
     path('register/', register_view, name='register'),
     path('login/', login_view, name='login'),
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
@@ -33,6 +31,12 @@ urlpatterns = [
     path('calendar-events/create/', create_event, name='create-event'),  # Create a new event
     path('calendar-events/update/<int:event_id>/', update_event, name='update-event'),  # Update an event
     path('calendar-events/delete/<int:event_id>/', delete_event, name='delete-event'),  # Delete an event
+    path('get_lash_services/', get_lash_services, name='get_lash_services'),
+    path('get_brow_services/', get_brow_services, name='get_brow_services'),
+    path('get_manicure_services/', get_manicure_services, name='get_manicure_services'),
+    path('get_pedicure_services/', get_pedicure_services, name='get_pedicure_services'),
+    path('get_skin_services/', get_skin_services, name='get_skin_services'),
+    path('get_piercing_services/', get_piercing_services, name='get_piercing_services'),
 ]
 
 if settings.DEBUG:

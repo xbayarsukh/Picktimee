@@ -1,4 +1,6 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 
 class BrowPage extends StatefulWidget {
   @override
@@ -6,42 +8,57 @@ class BrowPage extends StatefulWidget {
 }
 
 class _BrowPageState extends State<BrowPage> {
-  bool isGrid = true; // Toggle between grid & list view
+  bool isGrid = true;
+  List<dynamic> categories = [];
+  List<dynamic> browServices = [];
 
-  final List<String> categories = [
-    "Classic Brow",
-    "Volume Brow",
-    "Hybrid Brow",
-    "Mega Volume Brow",
-    "Wispy Brow"
-  ];
+  @override
+  void initState() {
+    super.initState();
+    fetchBrowServices();
+  }
 
-  final List<Map<String, String>> browItems = [
-    {"name": "Classic Brow", "image": "assets/images/1.jpg"},
-    {"name": "Volume Brow", "image": "assets/images/2.jpg"},
-    {"name": "Hybrid Brow", "image": "assets/images/3.jpg"},
-    {"name": "Mega Volume Brow", "image": "assets/images/4.jpg"},
-    {"name": "Wispy Brow", "image": "assets/images/5.jpg"},
-  ];
+  Future<void> fetchBrowServices() async {
+    try {
+      final response =
+          await http.get(Uri.parse('http://127.0.0.1:8000/get_brow_services/'));
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        if (data['categories'] != null && data['services'] != null) {
+          setState(() {
+            categories = data['categories'];
+            browServices = data['services'];
+          });
+        } else {
+          throw Exception('Missing categories or services data');
+        }
+      } else {
+        throw Exception(
+            'Failed to load brow services. Status: ${response.statusCode}');
+      }
+    } catch (e) {
+      print("Error: $e");
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Column(
         children: [
-          // Custom AppBar with background
+          // Custom AppBar
           Container(
-            height: 80,
+            height: 70,
             decoration: BoxDecoration(
               color: Color.fromARGB(255, 218, 175, 249),
               borderRadius: BorderRadius.only(
-                bottomLeft: Radius.circular(50),
-                bottomRight: Radius.circular(50),
+                bottomLeft: Radius.circular(40),
+                bottomRight: Radius.circular(40),
               ),
             ),
             child: SafeArea(
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -52,12 +69,11 @@ class _BrowPageState extends State<BrowPage> {
                       },
                     ),
                     Text(
-                      "Brow Categories",
+                      "Шивээс",
                       style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white),
                     ),
                     IconButton(
                       icon: Icon(
@@ -76,84 +92,65 @@ class _BrowPageState extends State<BrowPage> {
             ),
           ),
 
-          SizedBox(height: 10),
+          SizedBox(height: 8),
 
-          // Categories list
-          SizedBox(
-            height: 30,
-            child: ListView.builder(
-              scrollDirection: Axis.horizontal,
-              itemCount: categories.length,
-              itemBuilder: (context, index) {
-                return Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 6.0),
-                  child: TextButton(
-                    onPressed: () {},
-                    style: TextButton.styleFrom(
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                      backgroundColor: Color.fromARGB(255, 218, 175, 249),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(
-                            20), // Rounded edges (if needed)
-                      ),
-                    ),
-                    child: Text(
-                      categories[index],
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ),
-                );
-              },
-            ),
-          ),
-
-          SizedBox(height: 10),
-
-          // Brow items (Grid/List)
+          // Brow Services Grid/List View
           Expanded(
             child: isGrid
                 ? GridView.builder(
-                    padding: EdgeInsets.all(10),
-                    itemCount: browItems.length,
+                    padding: EdgeInsets.all(8),
+                    itemCount: browServices.length,
                     gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 2,
-                      crossAxisSpacing: 10,
-                      mainAxisSpacing: 10,
-                      childAspectRatio: 0.8, // Aspect ratio adjustment
+                      crossAxisSpacing: 8,
+                      mainAxisSpacing: 8,
+                      childAspectRatio: 0.8,
                     ),
                     itemBuilder: (context, index) {
+                      String imageUrl = browServices[index]['simage'] != null
+                          ? 'http://127.0.0.1:8000${browServices[index]['simage']}'
+                          : 'https://via.placeholder.com/150';
+
                       return Card(
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(15),
-                        ),
-                        elevation: 5,
+                            borderRadius: BorderRadius.circular(12)),
+                        elevation: 4,
                         child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            SizedBox(
-                              height: 80,
-                              width: double.infinity,
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(10),
-                                child: Image.asset(
-                                  browItems[index]["image"]!,
-                                  fit: BoxFit.cover,
-                                ),
-                              ),
+                            ClipRRect(
+                              borderRadius: BorderRadius.vertical(
+                                  top: Radius.circular(12)),
+                              child: Image.network(imageUrl,
+                                  height: 200,
+                                  width: double.infinity,
+                                  fit: BoxFit.cover),
                             ),
-                            SizedBox(height: 10),
-                            Text(
-                              browItems[index]["name"]!,
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16,
-                                color: Color.fromARGB(255, 218, 175, 249),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  vertical: 6, horizontal: 8),
+                              child: Column(
+                                children: [
+                                  Text(
+                                    browServices[index]['sname'],
+                                    style: TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.bold,
+                                        color:
+                                            Color.fromARGB(255, 218, 175, 249)),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                  Text(
+                                    '\₮${browServices[index]['sprice']}',
+                                    style: TextStyle(
+                                        fontSize: 12, color: Colors.green),
+                                  ),
+                                  Text(
+                                    '${browServices[index]['sduration']}',
+                                    style: TextStyle(
+                                        fontSize: 12, color: Colors.grey),
+                                  ),
+                                ],
                               ),
-                              textAlign: TextAlign.center,
                             ),
                           ],
                         ),
@@ -161,33 +158,35 @@ class _BrowPageState extends State<BrowPage> {
                     },
                   )
                 : ListView.builder(
-                    padding: EdgeInsets.all(10),
-                    itemCount: browItems.length,
+                    padding: EdgeInsets.all(8),
+                    itemCount: browServices.length,
                     itemBuilder: (context, index) {
+                      String imageUrl = browServices[index]['simage'] != null
+                          ? 'http://127.0.0.1:8000${browServices[index]['simage']}'
+                          : 'https://via.placeholder.com/180';
+
                       return Card(
                         elevation: 3,
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
+                            borderRadius: BorderRadius.circular(10)),
                         child: ListTile(
-                          contentPadding: EdgeInsets.all(10),
+                          contentPadding: EdgeInsets.all(8),
                           leading: ClipRRect(
-                            borderRadius: BorderRadius.circular(8),
-                            child: Image.asset(
-                              browItems[index]["image"]!,
-                              width: 50,
-                              height: 50,
-                              fit: BoxFit.cover,
-                            ),
+                            borderRadius: BorderRadius.circular(6),
+                            child: Image.network(imageUrl,
+                                width: 50, height: 50, fit: BoxFit.cover),
                           ),
                           title: Text(
-                            browItems[index]["name"]!,
-                            style: TextStyle(fontWeight: FontWeight.bold),
+                            browServices[index]['sname'],
+                            style: TextStyle(
+                                fontSize: 14, fontWeight: FontWeight.bold),
                           ),
-                          trailing: Icon(Icons.arrow_forward_ios),
-                          onTap: () {
-                            // Handle navigation or action
-                          },
+                          subtitle: Text(
+                            '\₮${browServices[index]['sprice']} • ${browServices[index]['sduration']} mins',
+                            style: TextStyle(fontSize: 12, color: Colors.grey),
+                          ),
+                          trailing: Icon(Icons.arrow_forward_ios, size: 16),
+                          onTap: () {},
                         ),
                       );
                     },

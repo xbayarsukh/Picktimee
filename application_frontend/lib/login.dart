@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'register.dart';
 import 'service.dart'; // Import the service page
+import 'profile.dart'; // Import the profile page
 
 class LoginPage extends StatefulWidget {
   @override
@@ -78,7 +79,13 @@ class _LoginPageState extends State<LoginPage> {
                   left: 15,
                   child: IconButton(
                     icon: Icon(Icons.arrow_back, color: Colors.white, size: 28),
-                    onPressed: () => Navigator.pop(context),
+                    onPressed: () {
+                      // Navigate to ProfilePage when back button is pressed
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(builder: (context) => ProfilePage()),
+                      );
+                    },
                   ),
                 ),
                 Positioned(

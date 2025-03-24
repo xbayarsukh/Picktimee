@@ -94,7 +94,7 @@ class _ServicePageState extends State<ServicePage> {
                       child: TextField(
                         controller: _searchController,
                         decoration: InputDecoration(
-                          hintText: "Search services...",
+                          hintText: "Үйлчилгээ хайх...",
                           prefixIcon: Icon(Icons.search),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(50),

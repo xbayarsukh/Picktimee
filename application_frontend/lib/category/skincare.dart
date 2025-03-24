@@ -1,4 +1,6 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 
 class SkincarePage extends StatefulWidget {
   @override
@@ -6,42 +8,57 @@ class SkincarePage extends StatefulWidget {
 }
 
 class _SkincarePageState extends State<SkincarePage> {
-  bool isGrid = true; // Toggle between grid & list view
+  bool isGrid = true;
+  List<dynamic> categories = [];
+  List<dynamic> skincareServices = [];
 
-  final List<String> categories = [
-    "Cleansers",
-    "Moisturizers",
-    "Serums",
-    "Masks",
-    "Toners"
-  ];
+  @override
+  void initState() {
+    super.initState();
+    fetchSkincareServices();
+  }
 
-  final List<Map<String, String>> skincareItems = [
-    {"name": "Foaming Cleanser", "image": "assets/images/cleanser.jpg"},
-    {"name": "Hydrating Serum", "image": "assets/images/serum.jpg"},
-    {"name": "Vitamin C Serum", "image": "assets/images/serum2.jpg"},
-    {"name": "Anti-aging Cream", "image": "assets/images/cream.jpg"},
-    {"name": "Hydrating Mask", "image": "assets/images/mask.jpg"},
-  ];
+  Future<void> fetchSkincareServices() async {
+    try {
+      final response =
+          await http.get(Uri.parse('http://127.0.0.1:8000/get_skin_services/'));
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        if (data['categories'] != null && data['services'] != null) {
+          setState(() {
+            categories = data['categories'];
+            skincareServices = data['services'];
+          });
+        } else {
+          throw Exception('Missing categories or services data');
+        }
+      } else {
+        throw Exception(
+            'Failed to load skincare services. Status: ${response.statusCode}');
+      }
+    } catch (e) {
+      print("Error: $e");
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Column(
         children: [
-          // Custom AppBar with background
+          // Custom AppBar
           Container(
-            height: 80,
+            height: 70,
             decoration: BoxDecoration(
-              color: Color.fromARGB(255, 175, 218, 249),
+              color: Color.fromARGB(255, 218, 175, 249),
               borderRadius: BorderRadius.only(
-                bottomLeft: Radius.circular(50),
-                bottomRight: Radius.circular(50),
+                bottomLeft: Radius.circular(40),
+                bottomRight: Radius.circular(40),
               ),
             ),
             child: SafeArea(
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -52,12 +69,11 @@ class _SkincarePageState extends State<SkincarePage> {
                       },
                     ),
                     Text(
-                      "Skincare Categories",
+                      "Гоо сайхан",
                       style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white),
                     ),
                     IconButton(
                       icon: Icon(
@@ -76,84 +92,66 @@ class _SkincarePageState extends State<SkincarePage> {
             ),
           ),
 
-          SizedBox(height: 10),
+          SizedBox(height: 8),
 
-          // Categories list
-          SizedBox(
-            height: 30,
-            child: ListView.builder(
-              scrollDirection: Axis.horizontal,
-              itemCount: categories.length,
-              itemBuilder: (context, index) {
-                return Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 6.0),
-                  child: TextButton(
-                    onPressed: () {},
-                    style: TextButton.styleFrom(
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                      backgroundColor: Color.fromARGB(255, 175, 218, 249),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(
-                            20), // Rounded edges (if needed)
-                      ),
-                    ),
-                    child: Text(
-                      categories[index],
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ),
-                );
-              },
-            ),
-          ),
-
-          SizedBox(height: 10),
-
-          // Skincare items (Grid/List)
+          // Skincare Services Grid/List View
           Expanded(
             child: isGrid
                 ? GridView.builder(
-                    padding: EdgeInsets.all(10),
-                    itemCount: skincareItems.length,
+                    padding: EdgeInsets.all(8),
+                    itemCount: skincareServices.length,
                     gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 2,
-                      crossAxisSpacing: 10,
-                      mainAxisSpacing: 10,
-                      childAspectRatio: 0.8, // Aspect ratio adjustment
+                      crossAxisSpacing: 8,
+                      mainAxisSpacing: 8,
+                      childAspectRatio: 0.8,
                     ),
                     itemBuilder: (context, index) {
+                      String imageUrl = skincareServices[index]['simage'] !=
+                              null
+                          ? 'http://127.0.0.1:8000${skincareServices[index]['simage']}'
+                          : 'https://via.placeholder.com/150';
+
                       return Card(
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(15),
-                        ),
-                        elevation: 5,
+                            borderRadius: BorderRadius.circular(12)),
+                        elevation: 4,
                         child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            SizedBox(
-                              height: 80,
-                              width: double.infinity,
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(10),
-                                child: Image.asset(
-                                  skincareItems[index]["image"]!,
-                                  fit: BoxFit.cover,
-                                ),
-                              ),
+                            ClipRRect(
+                              borderRadius: BorderRadius.vertical(
+                                  top: Radius.circular(12)),
+                              child: Image.network(imageUrl,
+                                  height: 200,
+                                  width: double.infinity,
+                                  fit: BoxFit.cover),
                             ),
-                            SizedBox(height: 10),
-                            Text(
-                              skincareItems[index]["name"]!,
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16,
-                                color: Color.fromARGB(255, 175, 218, 249),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  vertical: 6, horizontal: 8),
+                              child: Column(
+                                children: [
+                                  Text(
+                                    skincareServices[index]['sname'],
+                                    style: TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.bold,
+                                        color:
+                                            Color.fromARGB(255, 218, 175, 249)),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                  Text(
+                                    '\₮${skincareServices[index]['sprice']}',
+                                    style: TextStyle(
+                                        fontSize: 12, color: Colors.green),
+                                  ),
+                                  Text(
+                                    '${skincareServices[index]['sduration']}',
+                                    style: TextStyle(
+                                        fontSize: 12, color: Colors.grey),
+                                  ),
+                                ],
                               ),
-                              textAlign: TextAlign.center,
                             ),
                           ],
                         ),
@@ -161,33 +159,36 @@ class _SkincarePageState extends State<SkincarePage> {
                     },
                   )
                 : ListView.builder(
-                    padding: EdgeInsets.all(10),
-                    itemCount: skincareItems.length,
+                    padding: EdgeInsets.all(8),
+                    itemCount: skincareServices.length,
                     itemBuilder: (context, index) {
+                      String imageUrl = skincareServices[index]['simage'] !=
+                              null
+                          ? 'http://127.0.0.1:8000${skincareServices[index]['simage']}'
+                          : 'https://via.placeholder.com/180';
+
                       return Card(
                         elevation: 3,
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
+                            borderRadius: BorderRadius.circular(10)),
                         child: ListTile(
-                          contentPadding: EdgeInsets.all(10),
+                          contentPadding: EdgeInsets.all(8),
                           leading: ClipRRect(
-                            borderRadius: BorderRadius.circular(8),
-                            child: Image.asset(
-                              skincareItems[index]["image"]!,
-                              width: 50,
-                              height: 50,
-                              fit: BoxFit.cover,
-                            ),
+                            borderRadius: BorderRadius.circular(6),
+                            child: Image.network(imageUrl,
+                                width: 50, height: 50, fit: BoxFit.cover),
                           ),
                           title: Text(
-                            skincareItems[index]["name"]!,
-                            style: TextStyle(fontWeight: FontWeight.bold),
+                            skincareServices[index]['sname'],
+                            style: TextStyle(
+                                fontSize: 14, fontWeight: FontWeight.bold),
                           ),
-                          trailing: Icon(Icons.arrow_forward_ios),
-                          onTap: () {
-                            // Handle navigation or action
-                          },
+                          subtitle: Text(
+                            '\₮${skincareServices[index]['sprice']} • ${skincareServices[index]['sduration']} mins',
+                            style: TextStyle(fontSize: 12, color: Colors.grey),
+                          ),
+                          trailing: Icon(Icons.arrow_forward_ios, size: 16),
+                          onTap: () {},
                         ),
                       );
                     },
