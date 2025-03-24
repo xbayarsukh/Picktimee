@@ -63,6 +63,22 @@ class Worker(models.Model):
     def __str__(self):
         return f"{self.wfirst} {self.wname}"
 
+# Service Category Model
+class ServiceCategory(models.Model):
+    category_id = models.AutoField(primary_key=True)
+    cname = models.CharField(max_length=255, unique=True, verbose_name="Category Name")
+    cdescription = models.TextField(null=True, blank=True, verbose_name="Category Description")
+
+    class Meta:
+        db_table = "t_service_category"
+        verbose_name = "Service Category"
+        verbose_name_plural = "Service Categories"
+        ordering = ['cname']
+
+    def __str__(self):
+        return self.cname
+
+
 # Service Model
 class Service(models.Model):
     service_id = models.AutoField(primary_key=True)
@@ -71,6 +87,7 @@ class Service(models.Model):
     sduration = models.CharField(max_length=255, unique=True, verbose_name="Duration")
     simage = models.ImageField(upload_to='images/', null=True, blank=True, verbose_name="Service Image")
     scomment = models.TextField(null=True, blank=True, verbose_name="Comment")
+    category = models.ForeignKey(ServiceCategory, on_delete=models.SET_NULL, null=True, blank=True, related_name="services", verbose_name="Category")
 
     class Meta:
         db_table = "t_service"
@@ -80,6 +97,7 @@ class Service(models.Model):
 
     def __str__(self):
         return self.sname
+
     
 class CalendarEvent(models.Model):
     event_id = models.AutoField(primary_key=True)

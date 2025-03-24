@@ -1,8 +1,12 @@
 from django.urls import path
 from App.views import *
 from rest_framework_simplejwt.views import TokenRefreshView
+from django.conf import settings
+from django.conf.urls.static import static
+from django.contrib import admin
 
 urlpatterns = [
+    path('admin/', admin.site.urls),
     path('register_customer/', register_customer, name='register'),
     path('login_customer/', login_customer, name='login'),
     path('register/', register_view, name='register'),
@@ -18,8 +22,10 @@ urlpatterns = [
     path("add_role/", add_role, name='add_role'),
     path("worker/", worker_list, name='worker'),
     path("add_worker/", add_worker, name='add_worker'),
+    path('categories/', category_list, name='category_list'),
+    path('categories/add/', add_category, name='add_categories'),  
     path("service/", service_list, name='service'),
-    path('add_service/', add_service, name='add_service'),
+    path('service/add/', add_service, name='add_service'),
     path('edit_service/<int:service_id>/', edit_service, name='edit_service'),
     path('delete_service/<int:service_id>/', delete_service, name='delete_service'),
     path('calendar-events/', list_events, name='list-events'),  # Get all events
@@ -28,3 +34,6 @@ urlpatterns = [
     path('calendar-events/update/<int:event_id>/', update_event, name='update-event'),  # Update an event
     path('calendar-events/delete/<int:event_id>/', delete_event, name='delete-event'),  # Delete an event
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -12,6 +12,7 @@ from .serializers import CalendarEventSerializer
 from .models import CalendarEvent
 import json
 from django.core.exceptions import ObjectDoesNotExist
+from django.conf import settings
 
 # Generate JWT tokens
 def get_tokens_for_user(user):
@@ -423,6 +424,63 @@ def add_worker(request):
 ###########################################################################################################################################
 
 
+def category_list(request):
+    if request.method == 'GET':
+        try:
+            with connection.cursor() as cursor:
+                cursor.execute("SELECT category_id, cname, cdescription FROM t_service_category;")
+                category_rows = cursor.fetchall()
+
+            categories = [
+                {
+                    "category_id": row[0],
+                    "cname": row[1],
+                    "cdescription": row[2]
+                }
+                for row in category_rows
+            ]
+
+            return JsonResponse(categories, safe=False, status=200)
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
+
+    return JsonResponse({'error': 'Invalid request method'}, status=400)
+
+
+
+
+def add_category(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            cname = data.get("cname")
+            cdescription = data.get("cdescription", "")
+
+            if not cname:
+                return JsonResponse({'error': 'Category name is required'}, status=400)
+
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    "INSERT INTO t_service_category (cname, cdescription) VALUES (%s, %s) RETURNING category_id;",
+                    [cname, cdescription]
+                )
+                new_category_id = cursor.fetchone()[0]
+
+            return JsonResponse({
+                "message": "Category added successfully",
+                "category": {
+                    "category_id": new_category_id,
+                    "cname": cname,
+                    "cdescription": cdescription
+                }
+            }, status=201)
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
+
+    return JsonResponse({'error': 'Invalid request method'}, status=400)
+
+
+############################################################################################################################################3
 
 def service_list(request):
     if request.method == 'GET':
@@ -432,30 +490,51 @@ def service_list(request):
             offset = (page - 1) * limit
 
             with connection.cursor() as cursor:
+                # Fetch service categories
+                cursor.execute("SELECT category_id, cname, cdescription FROM t_service_category;")
+                category_rows = cursor.fetchall()
+                categories = [
+                    {
+                        "category_id": row[0],
+                        "cname": row[1],
+                        "cdescription": row[2]
+                    }
+                    for row in category_rows
+                ]
+
+                # Fetch services with category info
                 cursor.execute("""
-                    SELECT *
-                    FROM t_service
+                    SELECT s.service_id, s.sname, s.sprice, s.sduration, s.simage, s.scomment, c.category_id, c.cname
+                    FROM t_service s
+                    LEFT JOIN t_service_category c ON s.category_id = c.category_id
                     LIMIT %s OFFSET %s;
                 """, [limit, offset])
-                rows = cursor.fetchall()
+                service_rows = cursor.fetchall()
 
-            # Map the rows to a dictionary structure matching the React table's requirements
-            services = [
-                {
-                    "service_id": row[0],
-                    "sname": row[1],
-                    "sprice": (row[2]),
-                    "sduration": row[3],
-                }
-                for row in rows
-            ]
+                services = [
+                    {
+                        "service_id": row[0],
+                        "sname": row[1],
+                        "sprice": row[2],
+                        "sduration": row[3],
+                        "simage": row[4] and f"{settings.MEDIA_URL}{row[4]}",
+                        "scomment": row[5],
+                        "category": {
+                            "category_id": row[6],
+                            "cname": row[7]
+                        } if row[6] else None
+                    }
+                    for row in service_rows
+                ]
 
-            return JsonResponse(services, safe=False, status=200)
+            return JsonResponse({"categories": categories, "services": services}, safe=False, status=200)
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=500)
+
     return JsonResponse({'error': 'Invalid request method'}, status=400)
 
 
+from .models import ServiceCategory
 
 @csrf_exempt
 def add_service(request):
@@ -466,6 +545,9 @@ def add_service(request):
             sname = data.get('sname')
             sprice = data.get('sprice')
             sduration = data.get('sduration')
+            simage = data.get('simage')  # assuming image URL or base64 string
+            scomment = data.get('scomment', "")
+            category_id = data.get('category_id')
 
             # Debugging print (optional: log these values for debugging in production)
             print("Received data:", data)
@@ -474,30 +556,38 @@ def add_service(request):
             if not sname or sprice is None or sduration is None:
                 return JsonResponse({'error': 'Missing required fields'}, status=400)
 
-            # Try to cast sprice to an integer
+            # Try to cast sprice to a decimal
             try:
-                sprice = int(sprice)  # Explicitly cast to integer
+                sprice = float(sprice)  # Cast to float for the DecimalField
             except ValueError:
-                return JsonResponse({'error': 'Invalid value for sprice. It should be an integer.'}, status=400)
+                return JsonResponse({'error': 'Invalid value for sprice. It should be a decimal number.'}, status=400)
 
-            # Validate the types again after the cast
+            # Validate the types
             if not isinstance(sduration, str):
                 return JsonResponse({'error': f"Invalid type for 'sduration'. Expected str, got {type(sduration).__name__}"}, status=400)
 
-            # Additional validation
             if sprice < 0:
                 return JsonResponse({'error': 'Price must be a positive value'}, status=400)
 
             if len(sduration.strip()) == 0:
                 return JsonResponse({'error': 'Duration cannot be empty'}, status=400)
 
+            # Validate category ID
+            if category_id:
+                try:
+                    category = ServiceCategory.objects.get(category_id=category_id)
+                except ServiceCategory.DoesNotExist:
+                    return JsonResponse({'error': 'Category not found'}, status=400)
+            else:
+                category = None
+
             # Insert into the database
             with connection.cursor() as cursor:
                 cursor.execute("""
-                    INSERT INTO t_service (sname, sprice, sduration)
-                    VALUES (%s, %s, %s)
+                    INSERT INTO t_service (sname, sprice, sduration, simage, scomment, category_id)
+                    VALUES (%s, %s, %s, %s, %s, %s)
                     RETURNING service_id;
-                """, [sname, sprice, sduration])
+                """, [sname, sprice, sduration, simage, scomment, category_id])
                 service_id = cursor.fetchone()
 
             if service_id:
@@ -511,7 +601,6 @@ def add_service(request):
             return JsonResponse({'error': str(e)}, status=500)
     else:
         return JsonResponse({'error': 'Invalid request method'}, status=405)
-    
 
 
 @csrf_exempt
