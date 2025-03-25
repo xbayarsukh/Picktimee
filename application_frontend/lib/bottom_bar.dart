@@ -2,8 +2,27 @@ import 'package:flutter/material.dart';
 import 'service.dart';
 import 'profile.dart';
 import 'booking.dart';
-import 'login.dart';
+import 'history.dart'; // Import the history page
+import 'location.dart'; // Import the location page
 import 'package:animated_bottom_navigation_bar/animated_bottom_navigation_bar.dart';
+
+void main() {
+  runApp(MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Salon App',
+      theme: ThemeData(
+        primarySwatch: Colors.purple,
+        visualDensity: VisualDensity.adaptivePlatformDensity,
+      ),
+      home: MyHomePage(),
+    );
+  }
+}
 
 class MyHomePage extends StatefulWidget {
   @override
@@ -15,13 +34,16 @@ class _MyHomePageState extends State<MyHomePage> {
 
   final iconList = <IconData>[
     Icons.home,
+    Icons.history,
+    Icons.location_on,
     Icons.account_circle,
   ];
 
   final List<Widget> _pages = [
     ServicePage(),
-    ProfilePage(),
-    LoginPage(),
+    HistoryPage(), // Add the history page to the list
+    LocationPage(),
+    ProfilePage(), // Add the location page to the list
   ];
 
   @override

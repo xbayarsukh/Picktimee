@@ -1,9 +1,8 @@
 import 'dart:convert';
+import 'package:application_frontend/bottom_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'register.dart';
-import 'service.dart'; // Import the service page
-import 'profile.dart'; // Import the profile page
 
 class LoginPage extends StatefulWidget {
   @override
@@ -41,7 +40,7 @@ class _LoginPageState extends State<LoginPage> {
         // Navigate to ServicePage after successful login
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => ServicePage()),
+          MaterialPageRoute(builder: (context) => MyHomePage()),
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -83,7 +82,7 @@ class _LoginPageState extends State<LoginPage> {
                       // Navigate to ProfilePage when back button is pressed
                       Navigator.pushReplacement(
                         context,
-                        MaterialPageRoute(builder: (context) => ProfilePage()),
+                        MaterialPageRoute(builder: (context) => MyHomePage()),
                       );
                     },
                   ),
