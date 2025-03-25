@@ -765,6 +765,9 @@ def delete_service(request, service_id):
 
     return JsonResponse({'error': 'Invalid request method'}, status=405)  # 405 for invalid method
 
+
+##################################################################################################################################################
+
 # Create Event
 @api_view(['POST'])
 def create_event(request):
@@ -830,4 +833,94 @@ def delete_event(request, event_id):
     return Response({"detail": "Event deleted successfully."}, status=status.HTTP_204_NO_CONTENT) 
 
 
-    ###########################################################################################################################################
+###########################################################################################################################################
+
+from datetime import datetime, timedelta
+from .models import CalendarEvent, Service, Customer, Worker, Branch
+from django.utils import timezone
+from .models import *
+
+@csrf_exempt
+def book_service(request):
+    if request.method == "GET":
+        # Fetching branches, workers, and services
+        branches = list(Branch.objects.values("branch_id", "bname"))
+        workers = list(Worker.objects.values("worker_id", "wfirst"))
+        services = list(Service.objects.values("service_id", "sname"))
+
+        return JsonResponse({
+            "branches": [{"id": b["branch_id"], "name": b["bname"]} for b in branches],
+            "workers": [{"id": w["worker_id"], "name": w["wfirst"]} for w in workers],
+            "services": [{"id": s["service_id"], "name": s["sname"]} for s in services],
+        })
+
+    elif request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            service_id = data.get("service_id")
+            customer_id = data.get("customer_id")
+            worker_id = data.get("worker_id")
+            branch_id = data.get("branch_id")
+            date_str = data.get("date")  # Format: YYYY-MM-DD
+            time_str = data.get("time")  # Format: HH:MM AM/PM
+
+            if not (service_id and customer_id and branch_id and date_str and time_str):
+                return JsonResponse({"error": "Missing required fields"}, status=400)
+
+            # Update this line to correctly handle AM/PM format
+            start_time = datetime.strptime(f"{date_str} {time_str}", "%Y-%m-%d %I:%M %p")
+            end_time = start_time + timedelta(hours=1)  # Assuming 1-hour service duration
+
+            # Check if the worker is already booked at that time
+            if worker_id:
+                worker_booked = CalendarEvent.objects.filter(
+                    worker_id=worker_id,
+                    start_time__lt=end_time,
+                    end_time__gt=start_time,
+                ).exists()
+                if worker_booked:
+                    return JsonResponse({"error": "Worker is already booked"}, status=400)
+
+            event = CalendarEvent.objects.create(
+                service_id=service_id,
+                customer_id=customer_id,
+                worker_id=worker_id,
+                branch_id=branch_id,
+                start_time=start_time,
+                end_time=end_time,
+                description=f"Booking for service {service_id} at branch {branch_id}",
+            )
+
+            return JsonResponse({"message": "Booking successful", "event_id": event.event_id}, status=201)
+
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=500)
+
+    return JsonResponse({"error": "Invalid request method"}, status=405)
+
+@csrf_exempt
+def get_weekly_bookings(request, worker_id):
+    start_of_week = timezone.now().date() - timedelta(days=timezone.now().weekday())
+    end_of_week = start_of_week + timedelta(days=6)
+
+    bookings = CalendarEvent.objects.filter(
+        worker_id=worker_id,
+        start_time__date__gte=start_of_week,
+        start_time__date__lte=end_of_week
+    ).order_by("start_time")
+
+    return JsonResponse({"weekly_bookings": list(bookings.values())}, safe=False)
+
+@csrf_exempt
+def get_monthly_bookings(request, worker_id):
+    start_of_month = timezone.now().replace(day=1)
+    end_of_month = start_of_month + timedelta(days=30)
+
+    bookings = CalendarEvent.objects.filter(
+        worker_id=worker_id,
+        start_time__date__gte=start_of_month,
+        start_time__date__lte=end_of_month
+    ).order_by("start_time")
+
+    return JsonResponse({"monthly_bookings": list(bookings.values())}, safe=False)
+

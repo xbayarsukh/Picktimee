@@ -37,6 +37,7 @@ urlpatterns = [
     path('get_pedicure_services/', get_pedicure_services, name='get_pedicure_services'),
     path('get_skin_services/', get_skin_services, name='get_skin_services'),
     path('get_piercing_services/', get_piercing_services, name='get_piercing_services'),
+    path('book/', book_service, name="book_service"),
 ]
 
 if settings.DEBUG:

@@ -86,14 +86,6 @@ MIDDLEWARE = [
 ]
 # settings.py
 
-# Allow all origins (not recommended for production)
-CORS_ALLOW_ALL_ORIGINS = True
-
-# OR specify allowed origins
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",  # React app running on this port
-    # "https://yourdomain.com",  # Your production domain
-]
 
 
 ROOT_URLCONF = 'Backend.urls'
@@ -165,12 +157,12 @@ CORS_ALLOWED_ORIGINS = [
 # https://docs.djangoproject.com/en/4.1/topics/i18n/
 
 LANGUAGE_CODE = 'en-us'
-
-TIME_ZONE = 'UTC'
-
 USE_I18N = True
 
+
+TIME_ZONE = 'Asia/Ulaanbaatar'  # Set to your desired timezone
 USE_TZ = True
+
 
 
 # Static files (CSS, JavaScript, Images)

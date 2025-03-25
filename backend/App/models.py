@@ -108,6 +108,7 @@ class CalendarEvent(models.Model):
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE, related_name="events", verbose_name="Customer")
     worker = models.ForeignKey(Worker, on_delete=models.CASCADE, related_name="events", verbose_name="Worker", null=True, blank=True)
     branch = models.ForeignKey(Branch, on_delete=models.CASCADE, related_name="events", verbose_name="Branch")
+
     
     class Meta:
         db_table = "t_calendar_event"
