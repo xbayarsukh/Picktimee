@@ -2,11 +2,49 @@ from django.db import models
 from django.utils import timezone
 
 # Customer Model
-class Customer(models.Model):
+import uuid
+from django.db import models
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
+
+class CustomerManager(BaseUserManager):
+    def create_user(self, cemail, cname, cphone, password=None):
+        if not cemail:
+            raise ValueError("Email is required")
+        
+        customer = self.model(
+            cemail=self.normalize_email(cemail), 
+            cname=cname, 
+            cphone=cphone, 
+            token=uuid.uuid4().hex
+        )
+        customer.set_password(password)  # Hash the password properly
+        customer.save(using=self._db)
+        return customer
+
+    def create_superuser(self, cemail, cname, cphone, password):
+        customer = self.create_user(cemail, cname, cphone, password)
+        customer.is_admin = True
+        customer.save(using=self._db)
+        return customer
+
+class Customer(AbstractBaseUser):
     customer_id = models.AutoField(primary_key=True)
     cname = models.CharField(max_length=255, verbose_name="Customer Name")
     cemail = models.EmailField(unique=True, verbose_name="Customer Email")
     cphone = models.CharField(max_length=15, verbose_name="Customer Phone")
+    cimage = models.ImageField(upload_to='customers/', null=True, blank=True, verbose_name="Customer Image")
+    token = models.CharField(max_length=255, unique=True, blank=True, null=True)
+
+    last_login = models.DateTimeField(null=True, blank=True)  # 🔹 Explicitly add last_login
+    password = models.CharField(max_length=128)  # 🔹 Explicitly add password field
+
+    is_active = models.BooleanField(default=True)
+    is_admin = models.BooleanField(default=False)
+
+    objects = CustomerManager()
+
+    USERNAME_FIELD = 'cemail'
+    REQUIRED_FIELDS = ['cname', 'cphone']
 
     class Meta:
         db_table = "t_customer"
@@ -15,6 +53,13 @@ class Customer(models.Model):
 
     def __str__(self):
         return self.cname
+
+    @property
+    def is_staff(self):
+        return self.is_admin
+
+
+
 
 
 # Branch Model

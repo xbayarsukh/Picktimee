@@ -12,6 +12,7 @@ class _RegisterPageState extends State<RegisterPage> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController =
       TextEditingController();
@@ -25,15 +26,17 @@ class _RegisterPageState extends State<RegisterPage> {
         Uri.parse(url),
         headers: {"Content-Type": "application/json"},
         body: jsonEncode({
-          "username": _nameController.text, // Changed "name" to "username"
-          "email": _emailController.text,
+          "cname":
+              _nameController.text, // Ensure it matches the backend field name
+          "cemail": _emailController.text,
+          "cphone": _phoneController.text,
           "password": _passwordController.text,
         }),
       );
 
       final responseData = jsonDecode(response.body);
 
-      if (response.statusCode == 200) {
+      if (response.statusCode == 201) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
               content:
@@ -140,6 +143,22 @@ class _RegisterPageState extends State<RegisterPage> {
                       ),
                       validator: (value) =>
                           value!.isEmpty ? "Enter your email" : null,
+                    ),
+                    SizedBox(height: 20),
+                    TextFormField(
+                      controller: _phoneController,
+                      decoration: InputDecoration(
+                        labelText: "Phone Number",
+                        prefixIcon: Icon(Icons.phone, color: Color(0xFFB266FF)),
+                        filled: true,
+                        fillColor: Colors.white,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(15),
+                          borderSide: BorderSide.none,
+                        ),
+                      ),
+                      validator: (value) =>
+                          value!.isEmpty ? "Enter your phone number" : null,
                     ),
                     SizedBox(height: 20),
                     TextFormField(

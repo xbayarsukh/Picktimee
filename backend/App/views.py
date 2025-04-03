@@ -923,3 +923,64 @@ def get_monthly_bookings(request, worker_id):
 
     return JsonResponse({"monthly_bookings": list(bookings.values())}, safe=False)
 
+####################################################################################################################################################
+
+
+
+import uuid
+import json
+from django.contrib.auth import authenticate, login
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth.hashers import make_password
+from .models import Customer
+
+@csrf_exempt
+def register_customer(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            cname = data.get("cname")
+            cemail = data.get("cemail")
+            cphone = data.get("cphone")
+            password = data.get("password")
+
+            if Customer.objects.filter(cemail=cemail).exists():
+                return JsonResponse({"error": "Email already exists"}, status=400)
+
+            customer = Customer.objects.create(
+                cname=cname,
+                cemail=cemail,
+                cphone=cphone,
+                password=make_password(password),
+                token=uuid.uuid4().hex
+            )
+
+            return JsonResponse({"message": "User registered successfully", "token": customer.token}, status=201)
+
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=500)
+
+    return JsonResponse({"error": "Invalid request"}, status=400)
+
+
+@csrf_exempt
+def login_customer(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            cemail = data.get("cemail")
+            password = data.get("password")
+
+            customer = authenticate(request, cemail=cemail, password=password)
+
+            if customer is not None:
+                login(request, customer)
+                return JsonResponse({"message": "Login successful", "token": customer.token}, status=200)
+            else:
+                return JsonResponse({"error": "Invalid email or password"}, status=400)
+
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=500)
+
+    return JsonResponse({"error": "Invalid request"}, status=400)

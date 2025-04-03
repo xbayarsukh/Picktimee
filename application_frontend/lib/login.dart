@@ -3,6 +3,7 @@ import 'package:application_frontend/bottom_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'register.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -17,21 +18,27 @@ class _LoginPageState extends State<LoginPage> {
   Future<void> _login() async {
     if (_formKey.currentState!.validate()) {
       String url =
-          "http://127.0.0.1:8000/login/"; // Use 10.0.2.2 for localhost in Android emulator
+          "http://127.0.0.1:8000/login_customer/"; // Update URL for local or production
 
       final response = await http.post(
         Uri.parse(url),
         headers: {"Content-Type": "application/json"},
         body: jsonEncode({
-          "username": _emailController.text,
+          "cemail":
+              _emailController.text, // Ensure the field name matches backend
           "password": _passwordController.text,
         }),
       );
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        print("Access Token: ${data['access']}");
-        print("Refresh Token: ${data['refresh']}");
+        String token = data['token']; // Assuming token is returned here
+
+        print("Access Token: $token");
+
+        // Save token in SharedPreferences for future use
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        prefs.setString('access_token', token);
 
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text("Login Successful!")),
@@ -44,7 +51,7 @@ class _LoginPageState extends State<LoginPage> {
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Invalid username or password")),
+          SnackBar(content: Text("Invalid email or password")),
         );
       }
     }

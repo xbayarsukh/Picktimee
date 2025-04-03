@@ -38,6 +38,8 @@ urlpatterns = [
     path('get_skin_services/', get_skin_services, name='get_skin_services'),
     path('get_piercing_services/', get_piercing_services, name='get_piercing_services'),
     path('book/', book_service, name="book_service"),
+    path('register_customer/', register_customer, name='register_customer'),
+    path('login_customer/', login_customer, name='login_customer'),
 ]
 
 if settings.DEBUG:
