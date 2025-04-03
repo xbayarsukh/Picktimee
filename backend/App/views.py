@@ -11,7 +11,6 @@ from django.db import connection
 from .serializers import CalendarEventSerializer
 from .models import CalendarEvent
 import json
-from django.core.exceptions import ObjectDoesNotExist
 from django.conf import settings
 
 # Registration View

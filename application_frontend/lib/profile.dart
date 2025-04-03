@@ -60,14 +60,6 @@ class ProfilePage extends StatelessWidget {
           ),
           _buildProfileOption(
             context,
-            icon: Icons.history,
-            text: "History",
-            onTap: () {
-              // Handle History action
-            },
-          ),
-          _buildProfileOption(
-            context,
             icon: Icons.settings,
             text: "Settings",
             onTap: () {
