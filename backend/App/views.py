@@ -935,52 +935,60 @@ from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.hashers import make_password
 from .models import Customer
 
-@csrf_exempt
+@api_view(['POST'])
+@permission_classes([AllowAny])
 def register_customer(request):
-    if request.method == "POST":
-        try:
-            data = json.loads(request.body)
-            cname = data.get("cname")
-            cemail = data.get("cemail")
-            cphone = data.get("cphone")
-            password = data.get("password")
+    cname = request.data.get('cname')
+    cemail = request.data.get('cemail')
+    cphone = request.data.get('cphone')
+    password = request.data.get('password')
 
-            if Customer.objects.filter(cemail=cemail).exists():
-                return JsonResponse({"error": "Email already exists"}, status=400)
+    # Basic validation (expand as needed)
+    if not cemail or not password or not cname:
+        return Response({"error": "Name, email, and password are required."}, status=status.HTTP_400_BAD_REQUEST)
 
-            customer = Customer.objects.create(
-                cname=cname,
-                cemail=cemail,
-                cphone=cphone,
-                password=make_password(password),
-                token=uuid.uuid4().hex
-            )
+    # Check if the email already exists
+    if Customer.objects.filter(cemail=cemail).exists():
+        return Response({"error": "Email already exists."}, status=status.HTTP_400_BAD_REQUEST)
 
-            return JsonResponse({"message": "User registered successfully", "token": customer.token}, status=201)
+    # Create customer
+    customer = Customer.objects.create_user(
+        cemail=cemail,
+        cname=cname,
+        cphone=cphone,
+        password=password
+    )
 
-        except Exception as e:
-            return JsonResponse({"error": str(e)}, status=500)
-
-    return JsonResponse({"error": "Invalid request"}, status=400)
+    return Response({"message": "Customer created successfully.", "token": customer.token}, status=status.HTTP_201_CREATED)
 
 
-@csrf_exempt
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
 def login_customer(request):
-    if request.method == "POST":
-        try:
-            data = json.loads(request.body)
-            cemail = data.get("cemail")
-            password = data.get("password")
+    cemail = request.data.get('cemail')
+    password = request.data.get('password')
 
-            customer = authenticate(request, cemail=cemail, password=password)
+    # Authenticate customer
+    customer = authenticate(request, cemail=cemail, password=password)
 
-            if customer is not None:
-                login(request, customer)
-                return JsonResponse({"message": "Login successful", "token": customer.token}, status=200)
-            else:
-                return JsonResponse({"error": "Invalid email or password"}, status=400)
+    if customer:
+        refresh = RefreshToken.for_user(customer)
+        return Response({
+            'access': str(refresh.access_token),
+            'refresh': str(refresh)
+        })
+    return Response({"error": "Invalid email or password."}, status=status.HTTP_401_UNAUTHORIZED)
 
-        except Exception as e:
-            return JsonResponse({"error": str(e)}, status=500)
 
-    return JsonResponse({"error": "Invalid request"}, status=400)
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def logout_customer(request):
+    try:
+        refresh_token = request.data.get("refresh")
+        token = RefreshToken(refresh_token)
+        token.blacklist()
+        return Response(status=status.HTTP_205_RESET_CONTENT)
+    except Exception as e:
+        return Response({"error": "Invalid refresh token provided."}, status=status.HTTP_400_BAD_REQUEST)
+

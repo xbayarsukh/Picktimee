@@ -40,6 +40,7 @@ urlpatterns = [
     path('book/', book_service, name="book_service"),
     path('register_customer/', register_customer, name='register_customer'),
     path('login_customer/', login_customer, name='login_customer'),
+    path('logout_customer/', logout_customer, name='logout_customer'),
 ]
 
 if settings.DEBUG:

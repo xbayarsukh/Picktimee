@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'service.dart';
 import 'profile.dart';
 import 'booking.dart';
-import 'history.dart'; // Import the history page
-import 'location.dart'; // Import the location page
+import 'history.dart';
+import 'location.dart';
 import 'package:animated_bottom_navigation_bar/animated_bottom_navigation_bar.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'login.dart'; // Import LoginPage
 
 void main() {
   runApp(MyApp());
@@ -41,10 +43,46 @@ class _MyHomePageState extends State<MyHomePage> {
 
   final List<Widget> _pages = [
     ServicePage(),
-    HistoryPage(), // Add the history page to the list
+    HistoryPage(),
     LocationPage(),
-    ProfilePage(), // Add the location page to the list
+    ProfilePage(),
   ];
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  // Check if the user is logged in by looking for the access token
+  Future<bool> _isLoggedIn() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('access_token');
+    return token != null && token.isNotEmpty;
+  }
+
+  void _onTabTapped(int index) async {
+    if (index == 3) {
+      // If the Profile page is tapped, check if the user is logged in
+      bool loggedIn = await _isLoggedIn();
+      if (!loggedIn) {
+        // If not logged in, redirect to LoginPage
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => LoginPage()),
+        );
+      } else {
+        // Otherwise, navigate to ProfilePage
+        setState(() {
+          _bottomNavIndex = index;
+        });
+      }
+    } else {
+      // For other tabs, just update the bottom nav index
+      setState(() {
+        _bottomNavIndex = index;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -58,7 +96,7 @@ class _MyHomePageState extends State<MyHomePage> {
           );
         },
         child: Icon(Icons.calendar_month, color: Colors.white),
-        backgroundColor: Color(0xFF872BC0), // Purple color
+        backgroundColor: Color(0xFF872BC0),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       bottomNavigationBar: AnimatedBottomNavigationBar.builder(
@@ -72,8 +110,8 @@ class _MyHomePageState extends State<MyHomePage> {
         notchSmoothness: NotchSmoothness.verySmoothEdge,
         leftCornerRadius: 32,
         rightCornerRadius: 32,
-        backgroundColor: Color(0xFFDAAFFF), // Purple bottom bar color
-        onTap: (index) => setState(() => _bottomNavIndex = index),
+        backgroundColor: Color(0xFFDAAFFF),
+        onTap: _onTabTapped,
       ),
     );
   }
