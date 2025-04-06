@@ -57,9 +57,9 @@ REST_FRAMEWORK = {
 # Add or verify this setting
 SIMPLE_JWT = {
     'USER_ID_FIELD': 'customer_id',
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),  # Access token lifetime
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),    # Refresh token lifetime
-    'BLACKLIST_AFTER_ROTATION': True,   # Your custom primary key field
+    # 'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),  # Access token lifetime
+    # 'REFRESH_TOKEN_LIFETIME': timedelta(days=1),    # Refresh token lifetime
+    # 'BLACKLIST_AFTER_ROTATION': True,   # Your custom primary key field
 }
 
 

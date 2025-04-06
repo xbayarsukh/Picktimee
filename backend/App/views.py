@@ -64,7 +64,7 @@ def login_customer(request):
             refresh.payload['user_id'] = customer.customer_id
 
             # Return token information
-            return JsonResponse({'token': str(refresh.access_token), 'customer_id': customer.customer_id})
+            return JsonResponse({'access': str(refresh.access_token),'refresh': str(refresh)})
         else:
             return JsonResponse({'error': 'Invalid email or password'}, status=400)
 
@@ -88,7 +88,7 @@ def logout_customer(request):
                 return Response({'error': 'Invalid token format'}, status=status.HTTP_400_BAD_REQUEST)
 
             # Create a RefreshToken object using the token
-            refresh_token = RefreshToken(token)
+            refresh_token = RefreshToken.for_user(token)
             
             # Blacklist the token (mark it as invalid)
             refresh_token.blacklist()
@@ -880,7 +880,7 @@ def book_service(request):
         try:
             data = json.loads(request.body)
             service_id = data.get("service_id")
-            customer_id = data.get("customer_id")
+            customer_id = customer_id
             worker_id = data.get("worker_id")
             branch_id = data.get("branch_id")
             date_str = data.get("date")  # Format: YYYY-MM-DD
