@@ -11,74 +11,97 @@ from django.db import connection
 from .serializers import CalendarEventSerializer
 from .models import CalendarEvent
 import json
-from django.conf import settings
+from django.conf import settings 
+from django.utils import timezone
+from rest_framework_simplejwt.exceptions import TokenError
+from django.contrib.auth import get_user_model
 
-# Registration View
+
+Customer = get_user_model()
+
+@csrf_exempt
+def register_customer(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        cname = data.get('cname')
+        cemail = data.get('cemail')
+        cphone = data.get('cphone')
+        password = data.get('password')
+
+        if Customer.objects.filter(cemail=cemail).exists():
+            return JsonResponse({'error': 'Email already exists'}, status=400)
+
+        customer = Customer.objects.create_user(
+            cname=cname,
+            cemail=cemail,
+            cphone=cphone,
+            password=password
+        )
+
+        return JsonResponse({'message': 'Customer registered successfully'}, status=201)
+
+
+
+
+
+@csrf_exempt
+def login_customer(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        cemail = data.get('cemail')
+        password = data.get('password')
+
+        try:
+            customer = Customer.objects.get(cemail=cemail)
+        except Customer.DoesNotExist:
+            return JsonResponse({'error': 'Invalid email or password'}, status=400)
+
+        if customer.check_password(password):
+            # Manually creating a refresh token and setting the correct user ID field
+            refresh = RefreshToken.for_user(customer)
+
+            # Explicitly add 'customer_id' to the payload to override the default 'id'
+            refresh.payload['user_id'] = customer.customer_id
+
+            # Return token information
+            return JsonResponse({'token': str(refresh.access_token), 'customer_id': customer.customer_id})
+        else:
+            return JsonResponse({'error': 'Invalid email or password'}, status=400)
+
+
+
+
+
+from rest_framework_simplejwt.exceptions import TokenError, InvalidToken
+
+
 @api_view(['POST'])
-@permission_classes([AllowAny])
-def register_view(request):
-    username = request.data.get('username')
-    password = request.data.get('password')
-    email = request.data.get('email')
-    first_name = request.data.get('first_name')
-    last_name = request.data.get('last_name')
+def logout_customer(request):
+    if request.method == 'POST':
+        try:
+            # Get the authorization token from the request header
+            token = request.headers.get('Authorization')
 
-    # Basic validation (you can expand this as needed)
-    if not username or not password or not email:
-        return Response({"error": "Username, password, and email are required."}, status=status.HTTP_400_BAD_REQUEST)
+            if token and token.startswith('Bearer '):
+                token = token.split(' ')[1]  # Extract the token
+            else:
+                return Response({'error': 'Invalid token format'}, status=status.HTTP_400_BAD_REQUEST)
 
-    # Check if the username already exists
-    if User.objects.filter(username=username).exists():
-        return Response({"error": "Username is already taken."}, status=status.HTTP_400_BAD_REQUEST)
+            # Create a RefreshToken object using the token
+            refresh_token = RefreshToken(token)
+            
+            # Blacklist the token (mark it as invalid)
+            refresh_token.blacklist()
 
-    # Create the user
-    user = User.objects.create_user(
-        username=username,
-        password=password,
-        email=email,
-        first_name=first_name,
-        last_name=last_name
-    )
-    user.save()
-    return Response({"message": "User created successfully."}, status=status.HTTP_201_CREATED)
+            return Response({'message': 'Successfully logged out'}, status=status.HTTP_200_OK)
+
+        except InvalidToken:
+            return Response({'error': 'Invalid token'}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
-##################################################################################################################################################
 
-
-# Login View
-@api_view(['POST'])
-@permission_classes([AllowAny])
-def login_view(request):
-    username = request.data.get('username')
-    password = request.data.get('password')
-    user = authenticate(username=username, password=password)
-
-    if user:
-        refresh = RefreshToken.for_user(user)
-        return Response({
-            'access': str(refresh.access_token),
-            'refresh': str(refresh)
-        })
-    return Response({"error": "Invalid username or password."}, status=status.HTTP_401_UNAUTHORIZED)
-
-# Logout View to blacklist tokens (optional)
-@api_view(['POST'])
-@permission_classes([IsAuthenticated])
-def logout_view(request):
-    try:
-        refresh_token = request.data.get("refresh")
-        token = RefreshToken(refresh_token)
-        token.blacklist()
-        return Response(status=status.HTTP_205_RESET_CONTENT)
-    except Exception as e:
-        return Response({"error": "Invalid refresh token provided."}, status=status.HTTP_400_BAD_REQUEST)
-
-# Protected View (Example)
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
-def protected_view(request):
-    return Response({"message": "This is a protected route, accessible only with a valid token."})
 
 
 
@@ -924,71 +947,4 @@ def get_monthly_bookings(request, worker_id):
     return JsonResponse({"monthly_bookings": list(bookings.values())}, safe=False)
 
 ####################################################################################################################################################
-
-
-
-import uuid
-import json
-from django.contrib.auth import authenticate, login
-from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
-from django.contrib.auth.hashers import make_password
-from .models import Customer
-
-@api_view(['POST'])
-@permission_classes([AllowAny])
-def register_customer(request):
-    cname = request.data.get('cname')
-    cemail = request.data.get('cemail')
-    cphone = request.data.get('cphone')
-    password = request.data.get('password')
-
-    # Basic validation (expand as needed)
-    if not cemail or not password or not cname:
-        return Response({"error": "Name, email, and password are required."}, status=status.HTTP_400_BAD_REQUEST)
-
-    # Check if the email already exists
-    if Customer.objects.filter(cemail=cemail).exists():
-        return Response({"error": "Email already exists."}, status=status.HTTP_400_BAD_REQUEST)
-
-    # Create customer
-    customer = Customer.objects.create_user(
-        cemail=cemail,
-        cname=cname,
-        cphone=cphone,
-        password=password
-    )
-
-    return Response({"message": "Customer created successfully.", "token": customer.token}, status=status.HTTP_201_CREATED)
-
-
-
-@api_view(['POST'])
-@permission_classes([AllowAny])
-def login_customer(request):
-    cemail = request.data.get('cemail')
-    password = request.data.get('password')
-
-    # Authenticate customer
-    customer = authenticate(request, cemail=cemail, password=password)
-
-    if customer:
-        refresh = RefreshToken.for_user(customer)
-        return Response({
-            'access': str(refresh.access_token),
-            'refresh': str(refresh)
-        })
-    return Response({"error": "Invalid email or password."}, status=status.HTTP_401_UNAUTHORIZED)
-
-
-@api_view(['POST'])
-@permission_classes([IsAuthenticated])
-def logout_customer(request):
-    try:
-        refresh_token = request.data.get("refresh")
-        token = RefreshToken(refresh_token)
-        token.blacklist()
-        return Response(status=status.HTTP_205_RESET_CONTENT)
-    except Exception as e:
-        return Response({"error": "Invalid refresh token provided."}, status=status.HTTP_400_BAD_REQUEST)
 

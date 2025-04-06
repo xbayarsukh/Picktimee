@@ -53,7 +53,6 @@ class _SelectServicePageState extends State<SelectServicePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Book a Service")),
       body: isLoading
           ? Center(child: CircularProgressIndicator())
           : Center(

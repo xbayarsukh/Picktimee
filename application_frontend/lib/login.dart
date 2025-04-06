@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'package:application_frontend/bottom_bar.dart';
+import 'package:application_frontend/bottom_bar.dart'; // Ensure this is imported
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'register.dart';
@@ -18,7 +18,7 @@ class _LoginPageState extends State<LoginPage> {
   Future<void> _login() async {
     if (_formKey.currentState!.validate()) {
       String url =
-          "http://127.0.0.1:8000/login_customer/"; // Update URL for local or production
+          "http://127.0.0.1:8000/login/"; // Update URL for local or production
 
       final response = await http.post(
         Uri.parse(url),
@@ -30,25 +30,51 @@ class _LoginPageState extends State<LoginPage> {
         }),
       );
 
+      // Debug: Print the response body to check the response format
+      // print('Response Body: ${response.body}');
+
       if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        String token = data['token']; // Assuming token is returned here
+        try {
+          // Attempt to decode the response body
+          final data = jsonDecode(response.body);
 
-        print("Access Token: $token");
+          // Check if expected keys are present
+          if (data.containsKey('access') && data.containsKey('refresh')) {
+            String accessToken =
+                data['access']; // The access token returned from the backend
+            String refreshToken =
+                data['refresh']; // The refresh token returned from the backend
 
-        // Save token in SharedPreferences for future use
-        SharedPreferences prefs = await SharedPreferences.getInstance();
-        prefs.setString('access_token', token);
+            // print("Access Token: $accessToken");
+            // print("Refresh Token: $refreshToken");
 
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Login Successful!")),
-        );
+            // Save access and refresh tokens in SharedPreferences for future use
+            SharedPreferences prefs = await SharedPreferences.getInstance();
+            prefs.setString('access_token', accessToken);
+            prefs.setString('refresh_token', refreshToken);
 
-        // Navigate to ServicePage after successful login
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => MyHomePage()),
-        );
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text("Login Successful!")),
+            );
+
+            // Navigate to BottomBar after successful login
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => MyHomePage()),
+            );
+          } else {
+            // If the response doesn't contain 'access' or 'refresh' tokens
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text("Unexpected response structure")),
+            );
+          }
+        } catch (e) {
+          // If error parsing the response body
+          print('Error parsing response: $e');
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text("Error parsing response")),
+          );
+        }
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text("Invalid email or password")),

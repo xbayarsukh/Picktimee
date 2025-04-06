@@ -1,17 +1,11 @@
 from django.urls import path
 from App.views import *
-from rest_framework_simplejwt.views import TokenRefreshView
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('register/', register_view, name='register'),
-    path('login/', login_view, name='login'),
-    path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-    path('logout/', logout_view, name='logout'),
-    path('protected/', protected_view, name='protected'),
     path("customer/", customer_list, name='customer'),
     path("add_customer/", add_customer, name='add_customer'),
     path("branch/", branch_list, name='branch'),
@@ -38,9 +32,9 @@ urlpatterns = [
     path('get_skin_services/', get_skin_services, name='get_skin_services'),
     path('get_piercing_services/', get_piercing_services, name='get_piercing_services'),
     path('book/', book_service, name="book_service"),
-    path('register_customer/', register_customer, name='register_customer'),
-    path('login_customer/', login_customer, name='login_customer'),
-    path('logout_customer/', logout_customer, name='logout_customer'),
+    path('register/', register_customer, name='register_customer'),
+    path('login/', login_customer, name='login_customer'),
+    path('logout/', logout_customer, name='logout_customer'),
 ]
 
 if settings.DEBUG:

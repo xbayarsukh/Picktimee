@@ -19,15 +19,13 @@ class _RegisterPageState extends State<RegisterPage> {
 
   Future<void> _register() async {
     if (_formKey.currentState!.validate()) {
-      String url =
-          "http://127.0.0.1:8000/register_customer/"; // Update if necessary
+      String url = "http://127.0.0.1:8000/register/"; // Update if necessary
 
       final response = await http.post(
         Uri.parse(url),
         headers: {"Content-Type": "application/json"},
         body: jsonEncode({
-          "cname":
-              _nameController.text, // Ensure it matches the backend field name
+          "cname": _nameController.text,
           "cemail": _emailController.text,
           "cphone": _phoneController.text,
           "password": _passwordController.text,
@@ -39,8 +37,9 @@ class _RegisterPageState extends State<RegisterPage> {
       if (response.statusCode == 201) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-              content:
-                  Text(responseData['message'] ?? "Registration Successful!")),
+            content:
+                Text(responseData['message'] ?? "Registration Successful!"),
+          ),
         );
         Navigator.pushReplacement(
           context,
@@ -49,8 +48,10 @@ class _RegisterPageState extends State<RegisterPage> {
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-              content: Text(
-                  responseData['error'] ?? "Registration failed. Try again.")),
+            content: Text(
+              responseData['error'] ?? "Registration failed. Try again.",
+            ),
+          ),
         );
       }
     }

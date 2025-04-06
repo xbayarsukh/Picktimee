@@ -1,10 +1,86 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'edit_profile.dart';
+import 'package:http/http.dart' as http;
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'login.dart'; // Import LoginPage
+import 'edit_profile.dart';
 
 class ProfilePage extends StatelessWidget {
+  final FlutterSecureStorage storage = FlutterSecureStorage();
+
+  // This function will log the user out
+  Future<void> _logout(BuildContext context) async {
+    // Show loading indicator
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return Center(child: CircularProgressIndicator());
+      },
+    );
+
+    // Retrieve refresh token from secure storage
+    String? refreshToken = await storage.read(key: 'refresh_token');
+    print(
+        'Reading Refresh Token: $refreshToken'); // Log the token to check its value
+
+    if (refreshToken == null) {
+      Navigator.pop(context); // Close loading dialog
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('No refresh token found')),
+      );
+      return;
+    }
+
+    try {
+      final response = await http.post(
+        Uri.parse('http://127.0.0.1:8000/logout/'), // Your logout API URL
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization':
+              'Bearer $refreshToken', // Send token in the Authorization header
+        },
+      );
+
+      Navigator.pop(context); // Close loading dialog
+
+      if (response.statusCode == 200) {
+        // Successfully logged out
+        await storage.delete(
+            key: 'refresh_token'); // Delete refresh token from secure storage
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => LoginPage()),
+        );
+      } else {
+        final responseBody = json.decode(response.body);
+        String errorMessage = responseBody['error'] ?? 'Error logging out';
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(errorMessage)),
+        );
+      }
+    } catch (e) {
+      Navigator.pop(context); // Close loading dialog
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error occurred: ${e.toString()}')),
+      );
+    }
+  }
+
+  // Function to store the refresh token during login
+  Future<void> _storeRefreshToken(String refreshToken) async {
+    await storage.write(key: 'refresh_token', value: refreshToken);
+    print(
+        'Stored Refresh Token: $refreshToken'); // Log the stored token to verify
+  }
+
+  // The widget build function
   @override
   Widget build(BuildContext context) {
+    // Replace with actual dynamic user data
+    String userName = "John Doe";
+    String userEmail = "johndoe@gmail.com";
+
     return Scaffold(
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -28,7 +104,7 @@ class ProfilePage extends StatelessWidget {
                   ),
                   SizedBox(height: 16),
                   Text(
-                    "John Doe", // Replace with dynamic user data
+                    userName, // Replace with dynamic user data
                     style: TextStyle(
                       fontSize: 28,
                       fontWeight: FontWeight.bold,
@@ -36,7 +112,7 @@ class ProfilePage extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    "johndoe@gmail.com", // Replace with dynamic email data
+                    userEmail, // Replace with dynamic email data
                     style: TextStyle(
                       fontSize: 16,
                       color: Colors.white,
@@ -68,13 +144,10 @@ class ProfilePage extends StatelessWidget {
           ),
           _buildProfileOption(
             context,
-            icon: Icons.login,
-            text: "Login",
+            icon: Icons.logout,
+            text: "Logout",
             onTap: () {
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) => LoginPage()),
-              );
+              _logout(context); // Call logout function when tapped
             },
           ),
         ],
@@ -82,6 +155,7 @@ class ProfilePage extends StatelessWidget {
     );
   }
 
+  // Helper function to create profile options (like Edit Profile, Settings, etc.)
   Widget _buildProfileOption(BuildContext context,
       {required IconData icon,
       required String text,

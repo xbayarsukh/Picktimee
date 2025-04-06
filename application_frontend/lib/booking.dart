@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'select_service.dart'; // Import the select_service.dart file
+import 'package:shared_preferences/shared_preferences.dart';
+import 'select_service.dart'; // Import the SelectServicePage (where the user selects the service)
+import 'login.dart'; // Import the LoginPage for redirect when not logged in
 
 class BookingPage extends StatelessWidget {
   @override
@@ -8,27 +10,25 @@ class BookingPage extends StatelessWidget {
       body: Center(
         child: Container(
           height: 500,
-          width: double.infinity, // Full width
-          margin: EdgeInsets.all(30), // Margin of 30 on all sides
+          width: double.infinity,
+          margin: EdgeInsets.all(30),
           decoration: BoxDecoration(
-            color: Color.fromARGB(255, 218, 175, 249), // Background color
-            borderRadius: BorderRadius.circular(10), // Rounded corners
+            color: Color.fromARGB(255, 218, 175, 249),
+            borderRadius: BorderRadius.circular(10),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.2), // Shadow color
-                spreadRadius: 2, // Spread radius
-                blurRadius: 10, // Blurring effect
-                offset: Offset(0, 4), // Moves shadow down
+                color: Colors.black.withOpacity(0.2),
+                spreadRadius: 2,
+                blurRadius: 10,
+                offset: Offset(0, 4),
               ),
             ],
           ),
           child: Padding(
             padding: const EdgeInsets.all(20.0),
             child: Column(
-              mainAxisAlignment:
-                  MainAxisAlignment.center, // Center the content vertically
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                // Title
                 Text(
                   'Цаг захиалах хэсэгт тавтай морил',
                   style: TextStyle(
@@ -37,8 +37,7 @@ class BookingPage extends StatelessWidget {
                     color: Color.fromARGB(255, 135, 43, 192),
                   ),
                 ),
-                SizedBox(height: 10), // Space between title and paragraph
-                // Paragraph
+                SizedBox(height: 10),
                 Text(
                   'Захиалсан цагаа өөрчлөх шаардлагатай бол урьдчилан мэдэгдэнэ үү. Хэрэв таны хүссэн цаг идэвхгүй буюу бүх цаг дууссан бол боломжтой цагийг сонгох. Тухайн үйлчилгээний талаар урьдчилан мэдээлэл авах. Захиалсан цагийнхаа хугацааг алдахгүйгээр ирэх, эсвэл 3-4 цагийн өмнө мэдэгдэх, хожимдвол захиалсан цаг хүчингүй болохыг анхаарна уу.',
                   textAlign: TextAlign.center,
@@ -47,67 +46,62 @@ class BookingPage extends StatelessWidget {
                     color: Colors.black,
                   ),
                 ),
-                Spacer(), // Pushes the buttons to the bottom
+                Spacer(),
                 Row(
-                  mainAxisAlignment:
-                      MainAxisAlignment.spaceEvenly, // Spaces buttons evenly
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     ElevatedButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) =>
-                                  SelectServicePage()), // Navigate to SelectServicePage
-                        );
+                      onPressed: () async {
+                        SharedPreferences prefs =
+                            await SharedPreferences.getInstance();
+                        String? accessToken = prefs.getString('access_token');
+
+                        // Check if the access token is present, meaning the user is logged in
+                        if (accessToken != null) {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => SelectServicePage()),
+                          );
+                        } else {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) =>
+                                    LoginPage()), // Redirect to login page if not logged in
+                          );
+                        }
                       },
                       style: ElevatedButton.styleFrom(
-                        minimumSize: Size(60, 40), // Set width and height
-                        primary:
-                            Colors.white, // Set the background color to white
+                        minimumSize: Size(60, 40),
+                        primary: Colors.white,
                       ),
-                      child: Text('Book Now',
-                          style: TextStyle(
-                              color: Color.fromARGB(255, 135, 43, 192))),
+                      child: Text(
+                        'Book Now',
+                        style:
+                            TextStyle(color: Color.fromARGB(255, 135, 43, 192)),
+                      ),
                     ),
                     ElevatedButton(
                       onPressed: () {
                         Navigator.pop(context); // Close the page
                       },
                       style: ElevatedButton.styleFrom(
-                        minimumSize: Size(20, 40), // Set width and height
-                        primary:
-                            Colors.white, // Set the background color to white
+                        minimumSize: Size(20, 40),
+                        primary: Colors.white,
                       ),
-                      child: Text('Cancel',
-                          style: TextStyle(
-                              color: Color.fromARGB(255, 135, 43, 192))),
+                      child: Text(
+                        'Cancel',
+                        style:
+                            TextStyle(color: Color.fromARGB(255, 135, 43, 192)),
+                      ),
                     ),
                   ],
-                )
+                ),
               ],
             ),
           ),
         ),
-      ),
-    );
-  }
-
-  void _bookService(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (_) => AlertDialog(
-        title: Text('Booking Confirmed'),
-        content: Text('Your service has been successfully booked!'),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              Navigator.pop(context);
-            },
-            child: Text('OK'),
-          ),
-        ],
       ),
     );
   }

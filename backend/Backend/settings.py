@@ -12,34 +12,15 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 
 from pathlib import Path
 import psycopg2
+from datetime import timedelta
 
+
+AUTH_USER_MODEL = 'App.Customer'
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
-
-# def connectDB():
-#     try:
-#         con = psycopg2.connect(
-#             host='192.168.0.15',
-#             dbname='time_roder',  # Corrected to dbname
-#             user='PostgreSQL',
-#             password='123',
-#             port='5432',
-#         )
-#         return con
-#     except psycopg2.Error as e:
-#         print("Unable to connect to the database.")
-#         print(e)
-#         return None
-
-# def disconnectDB(con):
-#     if con:
-#         con.close()
-
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-x1m9qh9tf-8^=f5hl)7n7bbq6do6)zm4ucj&@f4*^5zsf8z%f#'
@@ -61,6 +42,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'App', 
     'rest_framework',
+    'rest_framework_simplejwt',
     'rest_framework_simplejwt.token_blacklist', 
     'corsheaders',
 ]
@@ -71,6 +53,15 @@ REST_FRAMEWORK = {
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
 }
+
+# Add or verify this setting
+SIMPLE_JWT = {
+    'USER_ID_FIELD': 'customer_id',
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),  # Access token lifetime
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),    # Refresh token lifetime
+    'BLACKLIST_AFTER_ROTATION': True,   # Your custom primary key field
+}
+
 
 
 MIDDLEWARE = [
@@ -86,7 +77,7 @@ MIDDLEWARE = [
 ]
 # settings.py
 
-AUTH_USER_MODEL = 'App.Customer'
+
 
 
 

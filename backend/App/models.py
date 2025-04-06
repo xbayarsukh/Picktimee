@@ -1,62 +1,55 @@
 from django.db import models
 from django.utils import timezone
-
-# Customer Model
-import uuid
-from django.db import models
-from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 
 class CustomerManager(BaseUserManager):
-    def create_user(self, cemail, cname, cphone, password=None):
+    def create_user(self, cemail, cname, cphone, password=None, **extra_fields):
         if not cemail:
-            raise ValueError("Email is required")
+            raise ValueError("The Email field is required")
         
+        email = self.normalize_email(cemail)
         customer = self.model(
-            cemail=self.normalize_email(cemail), 
-            cname=cname, 
-            cphone=cphone, 
-            token=uuid.uuid4().hex
+            cemail=email,
+            cname=cname,
+            cphone=cphone,
+            **extra_fields
         )
-        customer.set_password(password)  # Hash the password properly
+        customer.set_password(password)
         customer.save(using=self._db)
         return customer
 
-    def create_superuser(self, cemail, cname, cphone, password):
-        customer = self.create_user(cemail, cname, cphone, password)
-        customer.is_admin = True
-        customer.save(using=self._db)
-        return customer
+    def create_superuser(self, cemail, cname, cphone, password=None, **extra_fields):
+        extra_fields.setdefault('is_staff', True)
+        extra_fields.setdefault('is_superuser', True)
 
-class Customer(AbstractBaseUser):
+        return self.create_user(cemail, cname, cphone, password, **extra_fields)
+
+
+class Customer(AbstractBaseUser, PermissionsMixin):
     customer_id = models.AutoField(primary_key=True)
-    cname = models.CharField(max_length=255, verbose_name="Customer Name")
-    cemail = models.EmailField(unique=True, verbose_name="Customer Email")
-    cphone = models.CharField(max_length=15, verbose_name="Customer Phone")
-    cimage = models.ImageField(upload_to='customers/', null=True, blank=True, verbose_name="Customer Image")
-    token = models.CharField(max_length=255, unique=True, blank=True, null=True)
-
-    last_login = models.DateTimeField(null=True, blank=True)  # 🔹 Explicitly add last_login
-    password = models.CharField(max_length=128)  # 🔹 Explicitly add password field
-
+    cname = models.CharField(max_length=255)
+    cemail = models.EmailField(unique=True)
+    cphone = models.CharField(max_length=15)
+    cimage = models.ImageField(upload_to='customer_images/', null=True, blank=True)
+    token = models.CharField(max_length=255, null=True, blank=True)
+    blacklist = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
-    is_admin = models.BooleanField(default=False)
+    is_staff = models.BooleanField(default=False)
 
-    objects = CustomerManager()
-
+    # Required fields for AbstractBaseUser
     USERNAME_FIELD = 'cemail'
     REQUIRED_FIELDS = ['cname', 'cphone']
 
+    objects = CustomerManager()
+
     class Meta:
-        db_table = "t_customer"
-        verbose_name = "Customer"
-        verbose_name_plural = "Customers"
+        db_table = 't_customer'
 
     def __str__(self):
         return self.cname
 
-    @property
-    def is_staff(self):
-        return self.is_admin
+
+
 
 
 
