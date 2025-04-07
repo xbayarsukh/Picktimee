@@ -50,16 +50,13 @@ class Customer(AbstractBaseUser, PermissionsMixin):
 
 
 
-
-
-
-
-
 # Branch Model
+
 class Branch(models.Model):
     branch_id = models.AutoField(primary_key=True)
     bname = models.CharField(max_length=255, verbose_name="Branch Name")
     blocation = models.CharField(max_length=255, verbose_name="Branch Location")
+    bimage = models.ImageField(upload_to='media/images', null=True, blank=True, verbose_name="Branch Image")  # 👈 Add this line
 
     class Meta:
         db_table = "t_branch"
@@ -68,6 +65,7 @@ class Branch(models.Model):
 
     def __str__(self):
         return self.bname
+
 
 
 # Role Model

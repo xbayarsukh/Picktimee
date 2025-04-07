@@ -1,23 +1,44 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
-class LocationPage extends StatelessWidget {
-  final List<Map<String, String>> branches = [
-    {
-      "name": "Downtown Salon",
-      "address": "123 Main St, City Center",
-      "image": "assets/images/branch1.jpg",
-    },
-    {
-      "name": "Uptown Beauty",
-      "address": "456 High St, Uptown",
-      "image": "assets/images/branch2.jpg",
-    },
-    {
-      "name": "Westside Lash Studio",
-      "address": "789 Sunset Blvd, Westside",
-      "image": "assets/images/branch3.jpg",
-    },
-  ];
+class LocationPage extends StatefulWidget {
+  @override
+  _LocationPageState createState() => _LocationPageState();
+}
+
+class _LocationPageState extends State<LocationPage> {
+  List<dynamic> branches = [];
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    fetchBranches();
+  }
+
+  Future<void> fetchBranches() async {
+    final url =
+        Uri.parse('http://127.0.0.1:8000/branch/'); // For Android Emulator
+
+    try {
+      final response = await http.get(url);
+      if (response.statusCode == 200) {
+        final List<dynamic> data = json.decode(response.body);
+        setState(() {
+          branches = data;
+          isLoading = false;
+        });
+      } else {
+        throw Exception("Failed to load branches");
+      }
+    } catch (e) {
+      print("Error fetching branches: $e");
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -48,47 +69,50 @@ class LocationPage extends StatelessWidget {
 
           // Branch list
           Expanded(
-            child: Padding(
-              padding: const EdgeInsets.all(12.0),
-              child: ListView.builder(
-                itemCount: branches.length,
-                itemBuilder: (context, index) {
-                  final branch = branches[index];
-                  return Card(
-                    elevation: 5,
-                    margin: EdgeInsets.symmetric(vertical: 10),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(15),
+            child: isLoading
+                ? Center(child: CircularProgressIndicator())
+                : Padding(
+                    padding: const EdgeInsets.all(12.0),
+                    child: ListView.builder(
+                      itemCount: branches.length,
+                      itemBuilder: (context, index) {
+                        final branch = branches[index];
+                        return Card(
+                          elevation: 5,
+                          margin: EdgeInsets.symmetric(vertical: 10),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                          child: ListTile(
+                            contentPadding: EdgeInsets.all(10),
+                            leading: ClipRRect(
+                              borderRadius: BorderRadius.circular(10),
+                              child: Image.network(
+                                branch["bimage"] ??
+                                    'https://via.placeholder.com/60',
+                                width: 60,
+                                height: 60,
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                            title: Text(
+                              branch["bname"] ?? '',
+                              style: TextStyle(
+                                  fontSize: 18, fontWeight: FontWeight.bold),
+                            ),
+                            subtitle: Text(branch["blocation"] ?? ''),
+                            trailing: IconButton(
+                              icon: Icon(Icons.map, color: Color(0xFF872BC0)),
+                              onPressed: () {
+                                print("Navigate to ${branch['bname']}");
+                                // TODO: Add Google Maps navigation logic here
+                              },
+                            ),
+                          ),
+                        );
+                      },
                     ),
-                    child: ListTile(
-                      contentPadding: EdgeInsets.all(10),
-                      leading: ClipRRect(
-                        borderRadius: BorderRadius.circular(10),
-                        child: Image.asset(
-                          branch["image"]!,
-                          width: 60,
-                          height: 60,
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                      title: Text(
-                        branch["name"]!,
-                        style: TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.bold),
-                      ),
-                      subtitle: Text(branch["address"]!),
-                      trailing: IconButton(
-                        icon: Icon(Icons.map, color: Colors.blue),
-                        onPressed: () {
-                          // Implement navigation logic here (e.g., open Google Maps)
-                          print("Navigate to ${branch['name']}");
-                        },
-                      ),
-                    ),
-                  );
-                },
-              ),
-            ),
+                  ),
           ),
         ],
       ),

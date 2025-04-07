@@ -178,7 +178,6 @@ def add_customer(request):
 ###########################################################################################################################################
 
 
-
 def branch_list(request):
     if request.method == 'GET':
         try:
@@ -188,18 +187,19 @@ def branch_list(request):
 
             with connection.cursor() as cursor:
                 cursor.execute("""
-                    SELECT *
+                    SELECT branch_id, bname, blocation, bimage
                     FROM t_branch
                     LIMIT %s OFFSET %s;
                 """, [limit, offset])
                 rows = cursor.fetchall()
 
-            # Map the rows to a dictionary structure matching the React table's requirements
             branches = [
                 {
                     "branch_id": row[0],
                     "bname": row[1],
                     "blocation": row[2],
+                    # Generate full image URL
+                    "bimage": request.build_absolute_uri(settings.MEDIA_URL + row[3]) if row[3] else None,
                 }
                 for row in rows
             ]
@@ -207,6 +207,7 @@ def branch_list(request):
             return JsonResponse(branches, safe=False, status=200)
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=500)
+
     return JsonResponse({'error': 'Invalid request method'}, status=400)
 
 
@@ -719,6 +720,9 @@ def add_service(request):
         return JsonResponse({'error': 'Invalid request method'}, status=405)
 
 
+################################################################################################################################################
+
+
 @csrf_exempt
 def edit_service(request, service_id):
     if request.method == 'PUT':  # Use PUT method for updating
@@ -789,6 +793,52 @@ def delete_service(request, service_id):
 
 
 ##################################################################################################################################################
+
+def service_search(request):
+    if request.method == 'GET':
+        search_term = request.GET.get('search_term', '').strip()
+        page = int(request.GET.get('page', 1))
+        limit = 10  # Number of services per page
+        offset = (page - 1) * limit
+
+        try:
+            # Fetch service categories for the response
+            categories = ServiceCategory.objects.all().values('category_id', 'cname', 'cdescription')
+
+            # Search services only by name (sname)
+            services_query = Service.objects.filter(
+                sname__icontains=search_term
+            ).select_related('category')[offset:offset + limit]
+
+            services = [
+                {
+                    "service_id": service.service_id,
+                    "sname": service.sname,
+                    "sprice": service.sprice,
+                    "sduration": service.sduration,
+                    "simage": service.simage.url if service.simage else None,
+                    "scomment": service.scomment,
+                    "category": {
+                        "category_id": service.category.category_id,
+                        "cname": service.category.cname
+                    } if service.category else None
+                }
+                for service in services_query
+            ]
+
+            return JsonResponse({"categories": list(categories), "services": services}, status=200)
+
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
+
+    return JsonResponse({'error': 'Invalid request method'}, status=400)
+
+
+
+
+
+##############################################################################################################################################
+
 
 # Create Event
 @api_view(['POST'])
