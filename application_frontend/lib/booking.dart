@@ -7,43 +7,55 @@ class BookingPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Color.fromARGB(
+          255, 235, 233, 252), // Light purple background for the whole page
       body: Center(
         child: Container(
-          height: 500,
+          height: 550,
           width: double.infinity,
-          margin: EdgeInsets.all(30),
+          margin: EdgeInsets.symmetric(horizontal: 20, vertical: 30),
           decoration: BoxDecoration(
-            color: Color.fromARGB(255, 218, 175, 249),
-            borderRadius: BorderRadius.circular(10),
+            gradient: LinearGradient(
+              colors: [
+                Color.fromARGB(255, 218, 175, 249),
+                Color.fromARGB(255, 174, 129, 234),
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            borderRadius: BorderRadius.circular(20),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.2),
-                spreadRadius: 2,
-                blurRadius: 10,
-                offset: Offset(0, 4),
+                color: Colors.black.withOpacity(0.1),
+                spreadRadius: 3,
+                blurRadius: 15,
+                offset: Offset(0, 5),
               ),
             ],
           ),
           child: Padding(
-            padding: const EdgeInsets.all(20.0),
+            padding: const EdgeInsets.all(25.0),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
                   'Цаг захиалах хэсэгт тавтай морил',
                   style: TextStyle(
-                    fontSize: 24,
+                    fontSize: 28,
                     fontWeight: FontWeight.bold,
-                    color: Color.fromARGB(255, 135, 43, 192),
+                    color: Color.fromARGB(255, 98, 24, 158),
+                    fontFamily: 'Roboto',
                   ),
+                  textAlign: TextAlign.center, // Centering the title text
                 ),
-                SizedBox(height: 10),
+                SizedBox(height: 20),
                 Text(
                   'Захиалсан цагаа өөрчлөх шаардлагатай бол урьдчилан мэдэгдэнэ үү. Хэрэв таны хүссэн цаг идэвхгүй буюу бүх цаг дууссан бол боломжтой цагийг сонгох. Тухайн үйлчилгээний талаар урьдчилан мэдээлэл авах. Захиалсан цагийнхаа хугацааг алдахгүйгээр ирэх, эсвэл 3-4 цагийн өмнө мэдэгдэх, хожимдвол захиалсан цаг хүчингүй болохыг анхаарна уу.',
-                  textAlign: TextAlign.center,
+                  textAlign: TextAlign.justify, // Justifying the paragraph text
                   style: TextStyle(
                     fontSize: 16,
-                    color: Colors.black,
+                    color: Colors.black87,
+                    fontFamily: 'Roboto',
                   ),
                 ),
                 Spacer(),
@@ -51,12 +63,35 @@ class BookingPage extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     ElevatedButton(
+                      // Буцах moved to the left
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      style: ElevatedButton.styleFrom(
+                        minimumSize: Size(100, 50),
+                        primary: Colors.white,
+                        onPrimary: Color.fromARGB(255, 98, 24, 158),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                        elevation: 5,
+                      ),
+                      child: Text(
+                        'Буцах',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                          color: Color.fromARGB(255, 98, 24, 158),
+                        ),
+                      ),
+                    ),
+                    ElevatedButton(
+                      // Цаг захиалах moved to the right
                       onPressed: () async {
                         SharedPreferences prefs =
                             await SharedPreferences.getInstance();
                         String? accessToken = prefs.getString('access_token');
 
-                        // Check if the access token is present, meaning the user is logged in
                         if (accessToken != null) {
                           Navigator.push(
                             context,
@@ -67,33 +102,25 @@ class BookingPage extends StatelessWidget {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) =>
-                                    LoginPage()), // Redirect to login page if not logged in
+                                builder: (context) => LoginPage()),
                           );
                         }
                       },
                       style: ElevatedButton.styleFrom(
-                        minimumSize: Size(60, 40),
-                        primary: Colors.white,
+                        minimumSize: Size(150, 50),
+                        primary: Color.fromARGB(255, 98, 24, 158),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                        elevation: 5,
                       ),
                       child: Text(
-                        'Book Now',
-                        style:
-                            TextStyle(color: Color.fromARGB(255, 135, 43, 192)),
-                      ),
-                    ),
-                    ElevatedButton(
-                      onPressed: () {
-                        Navigator.pop(context); // Close the page
-                      },
-                      style: ElevatedButton.styleFrom(
-                        minimumSize: Size(20, 40),
-                        primary: Colors.white,
-                      ),
-                      child: Text(
-                        'Cancel',
-                        style:
-                            TextStyle(color: Color.fromARGB(255, 135, 43, 192)),
+                        'Цаг захиалах',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white,
+                        ),
                       ),
                     ),
                   ],

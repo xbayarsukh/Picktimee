@@ -2,15 +2,67 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'login.dart'; // Import LoginPage
+import 'login.dart';
 import 'edit_profile.dart';
 
-class ProfilePage extends StatelessWidget {
-  final FlutterSecureStorage storage = FlutterSecureStorage();
+class ProfilePage extends StatefulWidget {
+  @override
+  _ProfilePageState createState() => _ProfilePageState();
+}
 
-  // This function will log the user out
+class _ProfilePageState extends State<ProfilePage> {
+  final FlutterSecureStorage storage = FlutterSecureStorage();
+  String userName = '';
+  String userEmail = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserInfo();
+  }
+
+  // Load user info from storage or fetch from API
+  Future<void> _loadUserInfo() async {
+    try {
+      // Example: Reading from storage
+      String? name = await storage.read(key: 'user_name');
+      String? email = await storage.read(key: 'user_email');
+
+      if (name != null && email != null) {
+        setState(() {
+          userName = name;
+          userEmail = email;
+        });
+      } else {
+        // Optional: fetch from API
+        String? accessToken = await storage.read(key: 'access_token');
+        if (accessToken != null) {
+          final response = await http.get(
+            Uri.parse('http://127.0.0.1:8000/profile/'), // your user API
+            headers: {
+              'Authorization': 'Bearer $accessToken',
+            },
+          );
+
+          if (response.statusCode == 200) {
+            final data = json.decode(response.body);
+            setState(() {
+              userName = data['name'] ?? 'Unknown';
+              userEmail = data['email'] ?? 'Unknown';
+            });
+
+            // Optionally store
+            await storage.write(key: 'user_name', value: userName);
+            await storage.write(key: 'user_email', value: userEmail);
+          }
+        }
+      }
+    } catch (e) {
+      print('Error loading user info: $e');
+    }
+  }
+
   Future<void> _logout(BuildContext context) async {
-    // Show loading indicator
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -19,13 +71,9 @@ class ProfilePage extends StatelessWidget {
       },
     );
 
-    // Retrieve refresh token from secure storage
     String? refreshToken = await storage.read(key: 'refresh_token');
-    print(
-        'Reading Refresh Token: $refreshToken'); // Log the token to check its value
-
     if (refreshToken == null) {
-      Navigator.pop(context); // Close loading dialog
+      Navigator.pop(context);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('No refresh token found')),
       );
@@ -34,20 +82,17 @@ class ProfilePage extends StatelessWidget {
 
     try {
       final response = await http.post(
-        Uri.parse('http://127.0.0.1:8000/logout/'), // Your logout API URL
+        Uri.parse('http://127.0.0.1:8000/logout/'),
         headers: {
           'Content-Type': 'application/json',
-          'Authorization':
-              'Bearer $refreshToken', // Send token in the Authorization header
+          'Authorization': 'Bearer $refreshToken',
         },
       );
 
-      Navigator.pop(context); // Close loading dialog
+      Navigator.pop(context);
 
       if (response.statusCode == 200) {
-        // Successfully logged out
-        await storage.delete(
-            key: 'refresh_token'); // Delete refresh token from secure storage
+        await storage.deleteAll();
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => LoginPage()),
@@ -60,27 +105,15 @@ class ProfilePage extends StatelessWidget {
         );
       }
     } catch (e) {
-      Navigator.pop(context); // Close loading dialog
+      Navigator.pop(context);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error occurred: ${e.toString()}')),
       );
     }
   }
 
-  // Function to store the refresh token during login
-  Future<void> _storeRefreshToken(String refreshToken) async {
-    await storage.write(key: 'refresh_token', value: refreshToken);
-    print(
-        'Stored Refresh Token: $refreshToken'); // Log the stored token to verify
-  }
-
-  // The widget build function
   @override
   Widget build(BuildContext context) {
-    // Replace with actual dynamic user data
-    String userName = "John Doe";
-    String userEmail = "johndoe@gmail.com";
-
     return Scaffold(
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -100,11 +133,16 @@ class ProfilePage extends StatelessWidget {
                 children: [
                   CircleAvatar(
                     radius: 50,
-                    backgroundImage: AssetImage('assets/images/1.jpg'),
+                    backgroundColor: Colors.white,
+                    child: Icon(
+                      Icons.person,
+                      size: 50,
+                      color: Color.fromARGB(255, 218, 175, 249),
+                    ),
                   ),
                   SizedBox(height: 16),
                   Text(
-                    userName, // Replace with dynamic user data
+                    userName.isNotEmpty ? userName : 'Loading...',
                     style: TextStyle(
                       fontSize: 28,
                       fontWeight: FontWeight.bold,
@@ -112,7 +150,7 @@ class ProfilePage extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    userEmail, // Replace with dynamic email data
+                    userEmail.isNotEmpty ? userEmail : '',
                     style: TextStyle(
                       fontSize: 16,
                       color: Colors.white,
@@ -139,7 +177,7 @@ class ProfilePage extends StatelessWidget {
             icon: Icons.settings,
             text: "Settings",
             onTap: () {
-              // Handle Settings action
+              // Implement settings page
             },
           ),
           _buildProfileOption(
@@ -147,7 +185,7 @@ class ProfilePage extends StatelessWidget {
             icon: Icons.logout,
             text: "Logout",
             onTap: () {
-              _logout(context); // Call logout function when tapped
+              _logout(context);
             },
           ),
         ],
@@ -155,7 +193,6 @@ class ProfilePage extends StatelessWidget {
     );
   }
 
-  // Helper function to create profile options (like Edit Profile, Settings, etc.)
   Widget _buildProfileOption(BuildContext context,
       {required IconData icon,
       required String text,

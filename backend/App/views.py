@@ -82,7 +82,7 @@ def logout_customer(request):
             # Get the authorization token from the request header
             token = request.headers.get('Authorization')
 
-            if token and token.startswith('Bearer '):
+            if token:
                 token = token.split(' ')[1]  # Extract the token
             else:
                 return Response({'error': 'Invalid token format'}, status=status.HTTP_400_BAD_REQUEST)
@@ -794,44 +794,6 @@ def delete_service(request, service_id):
 
 ##################################################################################################################################################
 
-def service_search(request):
-    if request.method == 'GET':
-        search_term = request.GET.get('search_term', '').strip()
-        page = int(request.GET.get('page', 1))
-        limit = 10  # Number of services per page
-        offset = (page - 1) * limit
-
-        try:
-            # Fetch service categories for the response
-            categories = ServiceCategory.objects.all().values('category_id', 'cname', 'cdescription')
-
-            # Search services only by name (sname)
-            services_query = Service.objects.filter(
-                sname__icontains=search_term
-            ).select_related('category')[offset:offset + limit]
-
-            services = [
-                {
-                    "service_id": service.service_id,
-                    "sname": service.sname,
-                    "sprice": service.sprice,
-                    "sduration": service.sduration,
-                    "simage": service.simage.url if service.simage else None,
-                    "scomment": service.scomment,
-                    "category": {
-                        "category_id": service.category.category_id,
-                        "cname": service.category.cname
-                    } if service.category else None
-                }
-                for service in services_query
-            ]
-
-            return JsonResponse({"categories": list(categories), "services": services}, status=200)
-
-        except Exception as e:
-            return JsonResponse({'error': str(e)}, status=500)
-
-    return JsonResponse({'error': 'Invalid request method'}, status=400)
 
 
 
@@ -998,3 +960,47 @@ def get_monthly_bookings(request, worker_id):
 
 ####################################################################################################################################################
 
+# views.py
+from rest_framework_simplejwt.views import TokenObtainPairView
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from .models import Customer
+
+class CustomerTokenSerializer(TokenObtainPairSerializer):
+    @classmethod
+    def get_token(cls, user):
+        token = super().get_token(user)
+        # Add extra user info to the token payload
+        token['cname'] = user.cname
+        token['cemail'] = user.cemail
+        token['cphone'] = user.cphone  # Add phone if needed
+        return token
+
+    def validate(self, attrs):
+        data = super().validate(attrs)
+        data['cname'] = self.user.cname
+        data['cemail'] = self.user.cemail
+        data['cphone'] = self.user.cphone  # Add phone to response if needed
+        return data
+
+class CustomerTokenObtainPairView(TokenObtainPairView):
+    serializer_class = CustomerTokenSerializer
+
+
+# views.py (continued)
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def user_profile(request):
+    customer = request.user
+    return Response({
+        'id': customer.customer_id,
+        'name': customer.cname,
+        'email': customer.cemail,
+        'phone': customer.cphone,
+        'image': customer.cimage.url if customer.cimage else None,
+        'blacklist': customer.blacklist,  # Add blacklist status if needed
+        'is_active': customer.is_active,  # Add active status if needed
+    })

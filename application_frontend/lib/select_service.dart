@@ -56,126 +56,236 @@ class _SelectServicePageState extends State<SelectServicePage> {
       body: isLoading
           ? Center(child: CircularProgressIndicator())
           : Center(
-              child: Container(
-                padding: EdgeInsets.all(20),
-                margin: EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: Color.fromARGB(255, 218, 175, 249),
-                  borderRadius: BorderRadius.circular(10),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.2),
-                      spreadRadius: 2,
-                      blurRadius: 10,
-                      offset: Offset(0, 4),
-                    ),
-                  ],
-                ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    DropdownButtonFormField<String>(
-                      decoration: InputDecoration(labelText: "Select Branch"),
-                      value: selectedBranch,
-                      items: branches
-                          .map((branch) => DropdownMenuItem(
-                                value: branch["id"].toString(),
-                                child: Text(branch["name"]),
-                              ))
-                          .toList(),
-                      onChanged: (value) {
-                        setState(() {
-                          selectedBranch = value;
-                        });
-                      },
-                    ),
-                    SizedBox(height: 15),
-                    DropdownButtonFormField<String>(
-                      decoration: InputDecoration(labelText: "Select Worker"),
-                      value: selectedWorker,
-                      items: workers
-                          .map((worker) => DropdownMenuItem(
-                                value: worker["id"].toString(),
-                                child: Text(worker["name"]),
-                              ))
-                          .toList(),
-                      onChanged: (value) {
-                        setState(() {
-                          selectedWorker = value;
-                        });
-                      },
-                    ),
-                    SizedBox(height: 15),
-                    DropdownButtonFormField<String>(
-                      decoration: InputDecoration(labelText: "Select Service"),
-                      value: selectedService,
-                      items: services
-                          .map((service) => DropdownMenuItem(
-                                value: service["id"].toString(),
-                                child: Text(service["name"]),
-                              ))
-                          .toList(),
-                      onChanged: (value) {
-                        setState(() {
-                          selectedService = value;
-                        });
-                      },
-                    ),
-                    SizedBox(height: 15),
-                    ListTile(
-                      title: Text(selectedDate == null
-                          ? "Select Date"
-                          : DateFormat('yyyy-MM-dd').format(selectedDate!)),
-                      trailing: Icon(Icons.calendar_today),
-                      onTap: () async {
-                        DateTime? pickedDate = await showDatePicker(
-                          context: context,
-                          initialDate: DateTime.now(),
-                          firstDate: DateTime.now(),
-                          lastDate: DateTime(2100),
-                        );
-                        if (pickedDate != null) {
-                          setState(() {
-                            selectedDate = pickedDate;
-                          });
-                        }
-                      },
-                    ),
-                    ListTile(
-                      title: Text(selectedTime == null
-                          ? "Select Time"
-                          : selectedTime!.format(context)),
-                      trailing: Icon(Icons.access_time),
-                      onTap: () async {
-                        TimeOfDay? pickedTime = await showTimePicker(
-                          context: context,
-                          initialTime: TimeOfDay.now(),
-                        );
-                        if (pickedTime != null) {
-                          setState(() {
-                            selectedTime = pickedTime;
-                          });
-                        }
-                      },
-                    ),
-                    SizedBox(height: 20),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        ElevatedButton(
-                          onPressed: () => Navigator.pop(context),
-                          child: Text("Back"),
-                        ),
-                        ElevatedButton(
-                          onPressed: _confirmSelection,
-                          child: Text("Confirm"),
-                        ),
+              child: SingleChildScrollView(
+                child: Container(
+                  padding: EdgeInsets.all(25),
+                  margin: EdgeInsets.all(30),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        Color.fromARGB(255, 218, 175, 249),
+                        Color.fromARGB(255, 174, 129, 234),
                       ],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
                     ),
-                  ],
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.15),
+                        spreadRadius: 3,
+                        blurRadius: 12,
+                        offset: Offset(0, 6),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Text(
+                        'Цаг захиалах',
+                        style: TextStyle(
+                          fontSize: 26,
+                          fontWeight: FontWeight.bold,
+                          color: Color.fromARGB(255, 98, 24, 158),
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      SizedBox(height: 10),
+                      Text(
+                        'Та үйлчилгээ, салбар, ажилтнаа сонгоод цаг болон өдрөө товлоно уу. Бүх талбарыг бөглөнө үү.',
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Color.fromARGB(255, 98, 24, 158),
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      SizedBox(height: 25),
+
+                      // Салбар сонгох
+                      DropdownButtonFormField<String>(
+                        decoration: _inputDecoration("Салбар сонгох"),
+                        value: selectedBranch,
+                        style: TextStyle(
+                          color: Color.fromARGB(255, 98, 24, 158),
+                        ),
+                        dropdownColor: Colors.white,
+                        items: branches
+                            .map((branch) => DropdownMenuItem(
+                                  value: branch["id"].toString(),
+                                  child: Text(branch["name"]),
+                                ))
+                            .toList(),
+                        onChanged: (value) {
+                          setState(() {
+                            selectedBranch = value;
+                          });
+                        },
+                      ),
+                      SizedBox(height: 15),
+
+                      // Ажилтан сонгох
+                      DropdownButtonFormField<String>(
+                        decoration: _inputDecoration("Ажилтан сонгох"),
+                        value: selectedWorker,
+                        style: TextStyle(
+                          color: Color.fromARGB(255, 98, 24, 158),
+                        ),
+                        dropdownColor: Colors.white,
+                        items: workers
+                            .map((worker) => DropdownMenuItem(
+                                  value: worker["id"].toString(),
+                                  child: Text(worker["name"]),
+                                ))
+                            .toList(),
+                        onChanged: (value) {
+                          setState(() {
+                            selectedWorker = value;
+                          });
+                        },
+                      ),
+                      SizedBox(height: 15),
+
+                      // Үйлчилгээ сонгох
+                      DropdownButtonFormField<String>(
+                        decoration: _inputDecoration("Үйлчилгээ сонгох"),
+                        value: selectedService,
+                        style: TextStyle(
+                          color: Color.fromARGB(255, 98, 24, 158),
+                        ),
+                        dropdownColor: Colors.white,
+                        items: services
+                            .map((service) => DropdownMenuItem(
+                                  value: service["id"].toString(),
+                                  child: Text(service["name"]),
+                                ))
+                            .toList(),
+                        onChanged: (value) {
+                          setState(() {
+                            selectedService = value;
+                          });
+                        },
+                      ),
+                      SizedBox(height: 15),
+
+                      // Огноо сонгох
+                      ListTile(
+                        tileColor: Colors.white.withOpacity(0.8),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12)),
+                        title: Text(
+                          selectedDate == null
+                              ? "Огноо сонгох"
+                              : DateFormat('yyyy-MM-dd').format(selectedDate!),
+                          style: TextStyle(
+                              color: Color.fromARGB(255, 98, 24, 158)),
+                        ),
+                        trailing: Icon(Icons.calendar_today,
+                            color: Color.fromARGB(255, 98, 24, 158)),
+                        onTap: () async {
+                          DateTime? pickedDate = await showDatePicker(
+                            context: context,
+                            initialDate: DateTime.now(),
+                            firstDate: DateTime.now(),
+                            lastDate: DateTime(2100),
+                          );
+                          if (pickedDate != null) {
+                            setState(() {
+                              selectedDate = pickedDate;
+                            });
+                          }
+                        },
+                      ),
+                      SizedBox(height: 10),
+
+                      // Цаг сонгох
+                      ListTile(
+                        tileColor: Colors.white.withOpacity(0.8),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12)),
+                        title: Text(
+                          selectedTime == null
+                              ? "Цаг сонгох"
+                              : selectedTime!.format(context),
+                          style: TextStyle(
+                              color: Color.fromARGB(255, 98, 24, 158)),
+                        ),
+                        trailing: Icon(Icons.access_time,
+                            color: Color.fromARGB(255, 98, 24, 158)),
+                        onTap: () async {
+                          TimeOfDay? pickedTime = await showTimePicker(
+                            context: context,
+                            initialTime: TimeOfDay.now(),
+                          );
+                          if (pickedTime != null) {
+                            setState(() {
+                              selectedTime = pickedTime;
+                            });
+                          }
+                        },
+                      ),
+                      SizedBox(height: 25),
+
+                      // Buttons
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          ElevatedButton(
+                            onPressed: () => Navigator.pop(context),
+                            style: ElevatedButton.styleFrom(
+                              minimumSize: Size(100, 45),
+                              backgroundColor: Colors.white,
+                              foregroundColor: Color.fromARGB(255, 98, 24, 158),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(30),
+                              ),
+                            ),
+                            child: Text("Буцах",
+                                style: TextStyle(
+                                    fontSize: 16, fontWeight: FontWeight.w600)),
+                          ),
+                          ElevatedButton(
+                            onPressed: _confirmSelection,
+                            style: ElevatedButton.styleFrom(
+                              minimumSize: Size(120, 45),
+                              backgroundColor: Color.fromARGB(255, 98, 24, 158),
+                              foregroundColor: Colors.white,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(30),
+                              ),
+                            ),
+                            child: Text("Баталгаажуулах",
+                                style: TextStyle(
+                                    fontSize: 16, fontWeight: FontWeight.w600)),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
+    );
+  }
+
+  InputDecoration _inputDecoration(String label) {
+    return InputDecoration(
+      labelText: label,
+      labelStyle: TextStyle(color: Color.fromARGB(255, 98, 24, 158)),
+      filled: false,
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide(color: Color.fromARGB(255, 98, 24, 158)),
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide(color: Color.fromARGB(255, 98, 24, 158)),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide:
+            BorderSide(color: Color.fromARGB(255, 98, 24, 158), width: 2),
+      ),
     );
   }
 
@@ -209,17 +319,17 @@ class _SelectServicePageState extends State<SelectServicePage> {
         final responseData = jsonDecode(response.body);
 
         if (response.statusCode == 201) {
-          _showDialog(
-              "Success", "Booking successful! ID: ${responseData['event_id']}");
+          _showDialog("Амжилттай",
+              "Таны захиалга амжилттай! ID: ${responseData['event_id']}");
         } else {
-          _showDialog("Error", responseData["error"]);
+          _showDialog("Алдаа", responseData["error"] ?? "Алдаа гарлаа.");
         }
       } catch (e) {
-        _showDialog("Error", "Failed to connect to server.");
+        _showDialog("Алдаа", "Сервертэй холбогдож чадсангүй.");
       }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Please fill all fields")),
+        SnackBar(content: Text("Бүх талбарыг бөглөнө үү")),
       );
     }
   }
