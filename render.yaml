@@ -23,6 +23,7 @@ services:
           property: connectionString
     healthCheckPath: /api/health/
     plan: free
+    workingDir: backend
 
 databases:
   - name: picktimee-db
