@@ -38,7 +38,7 @@ class _ProfilePageState extends State<ProfilePage> {
         String? accessToken = await storage.read(key: 'access_token');
         if (accessToken != null) {
           final response = await http.get(
-            Uri.parse('http://127.0.0.1:8000/profile/'), // your user API
+            Uri.parse('https://picktimee.onrender.com/profile/'), // your user API
             headers: {
               'Authorization': 'Bearer $accessToken',
             },
@@ -71,31 +71,39 @@ class _ProfilePageState extends State<ProfilePage> {
       },
     );
 
-    String? refreshToken = await storage.read(key: 'refresh_token');
-    if (refreshToken == null) {
-      Navigator.pop(context);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('No refresh token found')),
-      );
-      return;
-    }
-
     try {
+      // Get the refresh token from storage
+      String? refreshToken = await storage.read(key: 'refresh_token');
+      if (refreshToken == null) {
+        Navigator.pop(context);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('No refresh token found')),
+        );
+        return;
+      }
+
+      // Send logout request with refresh token
       final response = await http.post(
-        Uri.parse('http://127.0.0.1:8000/logout/'),
+        Uri.parse('https://picktimee.onrender.com/logout/'),
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer $refreshToken',
         },
+        body: jsonEncode({
+          'refresh': refreshToken,
+        }),
       );
 
       Navigator.pop(context);
 
       if (response.statusCode == 200) {
+        // Clear all stored data
         await storage.deleteAll();
-        Navigator.pushReplacement(
+        
+        // Navigate to login page
+        Navigator.pushAndRemoveUntil(
           context,
           MaterialPageRoute(builder: (context) => LoginPage()),
+          (route) => false, // This removes all previous routes
         );
       } else {
         final responseBody = json.decode(response.body);
