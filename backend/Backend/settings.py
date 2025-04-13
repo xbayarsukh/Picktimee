@@ -11,7 +11,8 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 
 from pathlib import Path
-import psycopg2
+import os
+import dj_database_url
 from datetime import timedelta
 
 
@@ -23,12 +24,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-x1m9qh9tf-8^=f5hl)7n7bbq6do6)zm4ucj&@f4*^5zsf8z%f#'
+SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-x1m9qh9tf-8^=f5hl)7n7bbq6do6)zm4ucj&@f4*^5zsf8z%f#')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', '').split(',')
 
 
 # Application definition
@@ -45,6 +46,7 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     'rest_framework_simplejwt.token_blacklist', 
     'corsheaders',
+    'whitenoise.runserver_nostatic',
 ]
 
 
@@ -57,9 +59,17 @@ REST_FRAMEWORK = {
 # Add or verify this setting
 SIMPLE_JWT = {
     'USER_ID_FIELD': 'customer_id',
-    # 'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),  # Access token lifetime
-    # 'REFRESH_TOKEN_LIFETIME': timedelta(days=1),    # Refresh token lifetime
-    # 'BLACKLIST_AFTER_ROTATION': True,   # Your custom primary key field
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+    'ROTATE_REFRESH_TOKENS': True,
+    'BLACKLIST_AFTER_ROTATION': True,
+    'ALGORITHM': 'HS256',
+    'SIGNING_KEY': SECRET_KEY,
+    'VERIFYING_KEY': None,
+    'AUTH_HEADER_TYPES': ('Bearer',),
+    'USER_ID_CLAIM': 'user_id',
+    'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken',),
+    'TOKEN_TYPE_CLAIM': 'token_type',
 }
 
 
@@ -67,6 +77,7 @@ SIMPLE_JWT = {
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -75,13 +86,6 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'App.middleware.TokenAuthenticationMiddleware',
 ]
-# settings.py
-
-
-
-
-
-
 
 ROOT_URLCONF = 'Backend.urls'
 
@@ -107,17 +111,13 @@ WSGI_APPLICATION = 'Backend.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
-# settings.py
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',  # Or your preferred backend
-        'NAME': 'time_order',
-        'USER': 'postgres',
-        'PASSWORD': '1004',
-        'HOST': 'localhost',
-        'PORT': '5432',
-    }
+    'default': dj_database_url.config(
+        default='postgres://postgres:1004@localhost:5432/time_order',
+        conn_max_age=600
+    )
 }
+
 APPEND_SLASH=False
 
 # Password validation
@@ -144,6 +144,7 @@ CORS_ALLOW_ALL_ORIGINS = True  # Allow all (for development)
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:64529",
     "http://127.0.0.1:8000",  # Django API
+    "https://picktimee-django.onrender.com",  # Add your Render.com domain
 ]
 
 
@@ -164,9 +165,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
 STATIC_URL = 'static/'
-import os
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-# The base directory of your project
 # Configure where uploaded media files should be stored
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
