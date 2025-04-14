@@ -38,7 +38,7 @@ class _ProfilePageState extends State<ProfilePage> {
         String? accessToken = await storage.read(key: 'access_token');
         if (accessToken != null) {
           final response = await http.get(
-            Uri.parse('http://127.0.0.1:8000/profile/'), // your user API
+            Uri.parse('https://picktimee.onrender.com/profile/'), // your user API
             headers: {
               'Authorization': 'Bearer $accessToken',
             },
