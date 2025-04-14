@@ -79,20 +79,23 @@ from rest_framework_simplejwt.exceptions import TokenError, InvalidToken
 def logout_customer(request):
     if request.method == 'POST':
         try:
-            # Get the refresh token from the request body
-            data = json.loads(request.body)
-            refresh_token = data.get('refresh')
-            
-            if not refresh_token:
-                return Response({'error': 'Refresh token is required'}, status=status.HTTP_400_BAD_REQUEST)
+            # Get the authorization token from the request header
+            token = request.headers.get('Authorization')
 
-            # Create a RefreshToken object and blacklist it
-            token = RefreshToken(refresh_token)
-            token.blacklist()
+            if token:
+                token = token.split(' ')[1]  # Extract the token
+            else:
+                return Response({'error': 'Invalid token format'}, status=status.HTTP_400_BAD_REQUEST)
+
+            # Create a RefreshToken object using the token
+            refresh_token = RefreshToken.for_user(token)
+            
+            # Blacklist the token (mark it as invalid)
+            refresh_token.blacklist()
 
             return Response({'message': 'Successfully logged out'}, status=status.HTTP_200_OK)
 
-        except TokenError:
+        except InvalidToken:
             return Response({'error': 'Invalid token'}, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
