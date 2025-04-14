@@ -14,31 +14,12 @@ from pathlib import Path
 import psycopg2
 from datetime import timedelta
 
-
 AUTH_USER_MODEL = 'App.Customer'
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
-
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-x1m9qh9tf-8^=f5hl)7n7bbq6do6)zm4ucj&@f4*^5zsf8z%f#'
-
-# SECURITY WARNING: don't run with debug turned on in production!
-<<<<<<< HEAD
-<<<<<<< HEAD
-DEBUG = os.environ.get('DEBUG', 'False') == 'True'
-=======
-DEBUG = True
->>>>>>> parent of 095a39c (Update settings.py)
-=======
-DEBUG = False
->>>>>>> parent of ae542f3 (Update settings.py)
-
 ALLOWED_HOSTS = []
-
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -55,7 +36,6 @@ INSTALLED_APPS = [
     'corsheaders',
 ]
 
-
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
@@ -70,8 +50,6 @@ SIMPLE_JWT = {
     # 'BLACKLIST_AFTER_ROTATION': True,   # Your custom primary key field
 }
 
-
-
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
@@ -83,14 +61,6 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'App.middleware.TokenAuthenticationMiddleware',
 ]
-# settings.py
-
-
-
-
-
-
-
 ROOT_URLCONF = 'Backend.urls'
 
 TEMPLATES = [
@@ -153,20 +123,14 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:64529",
     "http://127.0.0.1:8000",  # Django API
 ]
-
-
-
 # Internationalization
 # https://docs.djangoproject.com/en/4.1/topics/i18n/
 
 LANGUAGE_CODE = 'en-us'
 USE_I18N = True
 
-
 TIME_ZONE = 'Asia/Ulaanbaatar'  # Set to your desired timezone
 USE_TZ = True
-
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
@@ -178,7 +142,6 @@ import os
 # Configure where uploaded media files should be stored
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
