@@ -77,7 +77,17 @@ class _ProfilePageState extends State<ProfilePage> {
         await prefs.remove('refresh_token');
 
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Logged out successfully")),
+          SnackBar(
+            content: Text("Амжилттай гарлаа!"),
+            backgroundColor: Colors.green, // Custom background color
+            duration: Duration(seconds: 2), // Custom duration
+            action: SnackBarAction(
+              label: '', // Action label
+              onPressed: () {
+                // Action callback, for example, undo login attempt
+              },
+            ),
+          ),
         );
 
         // Navigate to bottom page
@@ -87,7 +97,17 @@ class _ProfilePageState extends State<ProfilePage> {
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Logout failed")),
+          SnackBar(
+            content: Text("Гарахад алдаа гарлаа!"),
+            backgroundColor: Colors.red, // Custom background color
+            duration: Duration(seconds: 2), // Custom duration
+            action: SnackBarAction(
+              label: '', // Action label
+              onPressed: () {
+                // Action callback, for example, undo login attempt
+              },
+            ),
+          ),
         );
       }
     }

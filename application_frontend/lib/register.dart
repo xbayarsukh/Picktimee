@@ -37,8 +37,15 @@ class _RegisterPageState extends State<RegisterPage> {
       if (response.statusCode == 201) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content:
-                Text(responseData['message'] ?? "Registration Successful!"),
+            content: Text("Бүртгэл амжилттай үүслээ!"),
+            backgroundColor: Colors.green, // Custom background color
+            duration: Duration(seconds: 2), // Custom duration
+            action: SnackBarAction(
+              label: '', // Action label
+              onPressed: () {
+                // Action callback, for example, undo login attempt
+              },
+            ),
           ),
         );
         Navigator.pushReplacement(
@@ -49,7 +56,16 @@ class _RegisterPageState extends State<RegisterPage> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              responseData['error'] ?? "Registration failed. Try again.",
+              responseData['Алдаа'] ??
+                  "Бүртгэр үүсэхэд алдаа гарлаа. Дахин оролдоно уу.",
+            ),
+            backgroundColor: Colors.red, // Custom background color
+            duration: Duration(seconds: 2), // Custom duration
+            action: SnackBarAction(
+              label: '', // Action label
+              onPressed: () {
+                // Action callback, for example, undo login attempt
+              },
             ),
           ),
         );
@@ -94,7 +110,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   right: 0,
                   child: Center(
                     child: Text(
-                      "Create Account",
+                      "Бүртгүүлэх",
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 28,
@@ -116,7 +132,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       controller: _nameController,
                       decoration: InputDecoration(
                         labelText:
-                            "Username", // Updated from "Full Name" to "Username"
+                            "Нэр", // Updated from "Full Name" to "Username"
                         prefixIcon:
                             Icon(Icons.person, color: Color(0xFFB266FF)),
                         filled: true,
@@ -127,13 +143,13 @@ class _RegisterPageState extends State<RegisterPage> {
                         ),
                       ),
                       validator: (value) =>
-                          value!.isEmpty ? "Enter your username" : null,
+                          value!.isEmpty ? "Нэр оруулна уу..." : null,
                     ),
                     SizedBox(height: 20),
                     TextFormField(
                       controller: _emailController,
                       decoration: InputDecoration(
-                        labelText: "Email",
+                        labelText: "Емайл",
                         prefixIcon: Icon(Icons.email, color: Color(0xFFB266FF)),
                         filled: true,
                         fillColor: Colors.white,
@@ -143,13 +159,13 @@ class _RegisterPageState extends State<RegisterPage> {
                         ),
                       ),
                       validator: (value) =>
-                          value!.isEmpty ? "Enter your email" : null,
+                          value!.isEmpty ? "Емайл оруулна уу..." : null,
                     ),
                     SizedBox(height: 20),
                     TextFormField(
                       controller: _phoneController,
                       decoration: InputDecoration(
-                        labelText: "Phone Number",
+                        labelText: "Утасны дугаар",
                         prefixIcon: Icon(Icons.phone, color: Color(0xFFB266FF)),
                         filled: true,
                         fillColor: Colors.white,
@@ -159,14 +175,14 @@ class _RegisterPageState extends State<RegisterPage> {
                         ),
                       ),
                       validator: (value) =>
-                          value!.isEmpty ? "Enter your phone number" : null,
+                          value!.isEmpty ? "Утасны дугаар оруулна уу..." : null,
                     ),
                     SizedBox(height: 20),
                     TextFormField(
                       controller: _passwordController,
                       obscureText: true,
                       decoration: InputDecoration(
-                        labelText: "Password",
+                        labelText: "Нууц үг",
                         prefixIcon: Icon(Icons.lock, color: Color(0xFFB266FF)),
                         filled: true,
                         fillColor: Colors.white,
@@ -176,7 +192,7 @@ class _RegisterPageState extends State<RegisterPage> {
                         ),
                       ),
                       validator: (value) => value!.length < 6
-                          ? "Password must be at least 6 characters"
+                          ? "Нууц үг дор хаяж 6 тэмдэгттэй байх ёстой"
                           : null,
                     ),
                     SizedBox(height: 20),
@@ -184,7 +200,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       controller: _confirmPasswordController,
                       obscureText: true,
                       decoration: InputDecoration(
-                        labelText: "Confirm Password",
+                        labelText: "Нууц үг оруулах",
                         prefixIcon:
                             Icon(Icons.lock_outline, color: Color(0xFFB266FF)),
                         filled: true,
@@ -195,7 +211,7 @@ class _RegisterPageState extends State<RegisterPage> {
                         ),
                       ),
                       validator: (value) => value != _passwordController.text
-                          ? "Passwords do not match"
+                          ? "Нууц үг таарахгүй байна"
                           : null,
                     ),
                     SizedBox(height: 30),
@@ -210,7 +226,7 @@ class _RegisterPageState extends State<RegisterPage> {
                             borderRadius: BorderRadius.circular(15),
                           ),
                         ),
-                        child: Text("Register",
+                        child: Text("Бүртгүүлэх",
                             style:
                                 TextStyle(fontSize: 18, color: Colors.white)),
                       ),
@@ -221,7 +237,7 @@ class _RegisterPageState extends State<RegisterPage> {
                         context,
                         MaterialPageRoute(builder: (context) => LoginPage()),
                       ),
-                      child: Text("Already have an account? Login",
+                      child: Text("Бүртгэлтэй үүсгэсэн үү? Нэвтрэх",
                           style: TextStyle(color: Color(0xFFB266FF))),
                     ),
                   ],

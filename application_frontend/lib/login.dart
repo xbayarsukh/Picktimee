@@ -54,7 +54,17 @@ class _LoginPageState extends State<LoginPage> {
             prefs.setString('refresh_token', refreshToken);
 
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text("Login Successful!")),
+              SnackBar(
+                content: Text("Амжилттай нэвтэрлээ!"),
+                backgroundColor: Colors.green, // Custom background color
+                duration: Duration(seconds: 2), // Custom duration
+                action: SnackBarAction(
+                  label: '', // Action label
+                  onPressed: () {
+                    // Action callback, for example, undo login attempt
+                  },
+                ),
+              ),
             );
 
             // Navigate to BottomBar after successful login
@@ -77,7 +87,17 @@ class _LoginPageState extends State<LoginPage> {
         }
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Invalid email or password")),
+          SnackBar(
+            content: Text("Емайл эсвэл нууц үг буруу байна!"),
+            backgroundColor: Colors.red, // Custom background color
+            duration: Duration(seconds: 2), // Custom duration
+            action: SnackBarAction(
+              label: '', // Action label
+              onPressed: () {
+                // Action callback, for example, undo login attempt
+              },
+            ),
+          ),
         );
       }
     }
@@ -126,7 +146,7 @@ class _LoginPageState extends State<LoginPage> {
                   right: 0,
                   child: Center(
                     child: Text(
-                      "Welcome Back",
+                      "Нэвтрэх",
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 28,
@@ -147,7 +167,7 @@ class _LoginPageState extends State<LoginPage> {
                     TextFormField(
                       controller: _emailController,
                       decoration: InputDecoration(
-                        labelText: "Email",
+                        labelText: "Емайл",
                         prefixIcon: Icon(Icons.email, color: Color(0xFFB266FF)),
                         filled: true,
                         fillColor: Colors.white,
@@ -157,14 +177,14 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                       ),
                       validator: (value) =>
-                          value!.isEmpty ? "Enter your email" : null,
+                          value!.isEmpty ? "Емайл оруулна уу..." : null,
                     ),
                     SizedBox(height: 20),
                     TextFormField(
                       controller: _passwordController,
                       obscureText: true,
                       decoration: InputDecoration(
-                        labelText: "Password",
+                        labelText: "Нууц үг",
                         prefixIcon: Icon(Icons.lock, color: Color(0xFFB266FF)),
                         filled: true,
                         fillColor: Colors.white,
@@ -174,7 +194,7 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                       ),
                       validator: (value) =>
-                          value!.isEmpty ? "Enter your password" : null,
+                          value!.isEmpty ? "Нууц үг оруулна уу..." : null,
                     ),
                     SizedBox(height: 30),
                     SizedBox(
@@ -188,7 +208,7 @@ class _LoginPageState extends State<LoginPage> {
                             borderRadius: BorderRadius.circular(15),
                           ),
                         ),
-                        child: Text("Login",
+                        child: Text("Нэвтрэх",
                             style:
                                 TextStyle(fontSize: 18, color: Colors.white)),
                       ),
@@ -203,7 +223,7 @@ class _LoginPageState extends State<LoginPage> {
                         );
                       },
                       child: Text(
-                        "Don't have an account? Sign Up",
+                        "Бүртгэл үүсгэсэн үү? Бүртгүүлэх",
                         style: TextStyle(color: Color(0xFFB266FF)),
                       ),
                     ),

@@ -125,23 +125,35 @@ class _SelectServicePageState extends State<SelectServicePage> {
                       SizedBox(height: 15),
 
                       // Ажилтан сонгох
-                      DropdownButtonFormField<String>(
-                        decoration: _inputDecoration("Ажилтан сонгох"),
-                        value: selectedWorker,
-                        style: TextStyle(
-                          color: Color.fromARGB(255, 98, 24, 158),
-                        ),
-                        dropdownColor: Colors.white,
-                        items: workers
-                            .map((worker) => DropdownMenuItem(
-                                  value: worker["id"].toString(),
-                                  child: Text(worker["name"]),
-                                ))
-                            .toList(),
-                        onChanged: (value) {
-                          setState(() {
-                            selectedWorker = value;
-                          });
+                      Text("Ажилтан сонгох",
+                          style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Color.fromARGB(255, 98, 24, 158))),
+                      SizedBox(height: 10),
+                      ListView.builder(
+                        shrinkWrap: true,
+                        itemCount: workers.length,
+                        itemBuilder: (context, index) {
+                          Map<String, dynamic> worker = workers[index];
+                          bool isAvailable = worker["availability"] ==
+                              "available"; // assuming worker has an "availability" field
+
+                          return ListTile(
+                            tileColor: isAvailable
+                                ? Colors.green.withOpacity(0.2)
+                                : Colors.red.withOpacity(0.2),
+                            title: Text(
+                              worker["name"],
+                              style: TextStyle(
+                                  color: Color.fromARGB(255, 98, 24, 158)),
+                            ),
+                            onTap: () {
+                              setState(() {
+                                selectedWorker = worker["id"].toString();
+                              });
+                            },
+                          );
                         },
                       ),
                       SizedBox(height: 15),
