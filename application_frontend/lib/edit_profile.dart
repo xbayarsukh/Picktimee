@@ -104,7 +104,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                       },
                       child: Text('Save Changes'),
                       style: ElevatedButton.styleFrom(
-                        primary: Color.fromARGB(255, 205, 171, 229),
+                        backgroundColor: Color.fromARGB(255, 205, 171, 229),
                         padding: EdgeInsets.symmetric(vertical: 14),
                       ),
                     ),

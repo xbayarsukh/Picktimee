@@ -68,9 +68,9 @@ class BookingPage extends StatelessWidget {
                         Navigator.pop(context);
                       },
                       style: ElevatedButton.styleFrom(
+                        foregroundColor: Color.fromARGB(255, 98, 24, 158),
                         minimumSize: Size(100, 50),
-                        primary: Colors.white,
-                        onPrimary: Color.fromARGB(255, 98, 24, 158),
+                        backgroundColor: Colors.white,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(30),
                         ),
@@ -108,7 +108,7 @@ class BookingPage extends StatelessWidget {
                       },
                       style: ElevatedButton.styleFrom(
                         minimumSize: Size(150, 50),
-                        primary: Color.fromARGB(255, 98, 24, 158),
+                        backgroundColor: Color.fromARGB(255, 98, 24, 158),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(30),
                         ),
