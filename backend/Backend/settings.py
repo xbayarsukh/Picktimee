@@ -36,7 +36,7 @@ INSTALLED_APPS = [
     'App', 
     'rest_framework',
     'rest_framework_simplejwt',
-    'rest_framework_simplejwt.token_blacklist', 
+    'rest_framework_simplejwt.token_blacklist',
     'corsheaders',
 ]
 
@@ -46,12 +46,13 @@ REST_FRAMEWORK = {
     ),
 }
 
+
 # Add or verify this setting
 SIMPLE_JWT = {
     'USER_ID_FIELD': 'customer_id',
-    # 'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),  # Access token lifetime
-    # 'REFRESH_TOKEN_LIFETIME': timedelta(days=1),    # Refresh token lifetime
-    # 'BLACKLIST_AFTER_ROTATION': True,   # Your custom primary key field
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),  # Adjust token lifetime as needed
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),    # Adjust refresh token lifetime
+    'BLACKLIST_AFTER_ROTATION': True,                # Optional: Add to blacklist after token is rotated
 }
 
 MIDDLEWARE = [
@@ -63,8 +64,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'App.middleware.TokenAuthenticationMiddleware',
 ]
+
 ROOT_URLCONF = 'Backend.urls'
 
 TEMPLATES = [

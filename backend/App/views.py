@@ -1,3 +1,4 @@
+from rest_framework_simplejwt.exceptions import TokenError, InvalidToken
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
 from rest_framework import status
@@ -70,41 +71,24 @@ def login_customer(request):
 
 
 
-
-
-from rest_framework_simplejwt.exceptions import TokenError, InvalidToken
-
-
+@csrf_exempt
 @api_view(['POST'])
+@permission_classes([AllowAny])
 def logout_customer(request):
-    if request.method == 'POST':
-        try:
-            # Get the authorization token from the request header
-            token = request.headers.get('Authorization')
+    try:
+        data = json.loads(request.body)
+        refresh_token = data.get('refresh')
 
-            if token:
-                token = token.split(' ')[1]  # Extract the token
-            else:
-                return Response({'error': 'Invalid token format'}, status=status.HTTP_400_BAD_REQUEST)
+        if not refresh_token:
+            return JsonResponse({'error': 'Refresh token required'}, status=400)
 
-            # Create a RefreshToken object using the token
-            refresh_token = RefreshToken.for_user(token)
-            
-            # Blacklist the token (mark it as invalid)
-            refresh_token.blacklist()
+        token = RefreshToken(refresh_token)
+        token.blacklist()
 
-            return Response({'message': 'Successfully logged out'}, status=status.HTTP_200_OK)
+        return JsonResponse({'message': 'Logout successful'}, status=200)
 
-        except InvalidToken:
-            return Response({'error': 'Invalid token'}, status=status.HTTP_400_BAD_REQUEST)
-        except Exception as e:
-            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
-
-
-
-
-
-
+    except TokenError as e:
+        return JsonResponse({'error': 'Invalid token'}, status=400)
 
 ###########################################################################################################################################
 
@@ -319,48 +303,30 @@ def add_role(request):
 
 ###########################################################################################################################################
 
-
-
+from django.core.paginator import Paginator
 
 def worker_list(request):
     if request.method == 'GET':
         try:
             page = int(request.GET.get('page', 1))
             limit = 10  # Number of workers per page
-            offset = (page - 1) * limit
 
-            with connection.cursor() as cursor:
-                cursor.execute("""
-                    SELECT 
-                        w.worker_id, 
-                        w.wfirst, 
-                        w.wname, 
-                        w.wphone, 
-                        r.role_name, 
-                        b.bname
-                    FROM 
-                        t_worker w
-                    JOIN 
-                        t_role r ON w.role_id = r.role_id
-                    JOIN 
-                        t_branch b ON w.branch_id = b.branch_id
-                    LIMIT %s OFFSET %s;
-                """, [limit, offset])
-                rows = cursor.fetchall()
+            workers_qs = Worker.objects.select_related('role', 'branch').all()
+            paginator = Paginator(workers_qs, limit)
+            current_page = paginator.get_page(page)
 
-            # Move the print statement after defining the workers list
             workers = [
                 {
-                    "worker_id": row[0],
-                    "wfirst": row[1],
-                    "wname": row[2],
-                    "wphone": row[3],
-                    "role_name": row[4],
-                    "bname": row[5],
+                    "worker_id": worker.worker_id,
+                    "wfirst": worker.wfirst,
+                    "wname": worker.wname,
+                    "wphone": worker.wphone,
+                    "role_name": worker.role.role_name if worker.role else None,
+                    "bname": worker.branch.bname if worker.branch else None,
+                    "worker_image": worker.worker_image.url if worker.worker_image else None,
                 }
-                for row in rows
+                for worker in current_page
             ]
-            print(workers)
 
             return JsonResponse(workers, safe=False, status=200)
         except Exception as e:
@@ -407,6 +373,22 @@ def add_worker(request):
             return JsonResponse({"error": str(e)}, status=400)
 
     return JsonResponse({"error": "Invalid request method"}, status=405)
+
+
+
+
+def get_made_by_worker(request, worker_id):
+    made_items = Made.objects.filter(made_worker_id=worker_id)
+
+    made_data = [{
+        "made_id": made.made_id,
+        "made_image": request.build_absolute_uri(made.made_image.url) if made.made_image else None,
+        "worker_name": str(made.made_worker),
+        "service_category": str(made.made_service_category),
+        "comment": made.comment
+    } for made in made_items]
+
+    return JsonResponse({"made_works": made_data})
 
 
 
@@ -1004,3 +986,6 @@ def user_profile(request):
         'blacklist': customer.blacklist,  # Add blacklist status if needed
         'is_active': customer.is_active,  # Add active status if needed
     })
+
+
+########################################################################################################################################################

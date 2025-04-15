@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'service.dart';
 import 'profile.dart';
 import 'booking.dart';
-import 'history.dart';
+import 'worker.dart';
 import 'location.dart';
 import 'package:animated_bottom_navigation_bar/animated_bottom_navigation_bar.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -36,14 +36,14 @@ class _MyHomePageState extends State<MyHomePage> {
 
   final iconList = <IconData>[
     Icons.home,
-    Icons.history,
+    Icons.work,
     Icons.location_on,
     Icons.account_circle,
   ];
 
   final List<Widget> _pages = [
     ServicePage(),
-    HistoryPage(),
+    WorkerPage(),
     LocationPage(),
     ProfilePage(),
   ];

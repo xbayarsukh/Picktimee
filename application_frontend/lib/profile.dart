@@ -1,9 +1,11 @@
 import 'dart:convert';
+import 'package:application_frontend/bottom_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'login.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'edit_profile.dart';
+import 'history.dart';
 
 class ProfilePage extends StatefulWidget {
   @override
@@ -21,10 +23,8 @@ class _ProfilePageState extends State<ProfilePage> {
     _loadUserInfo();
   }
 
-  // Load user info from storage or fetch from API
   Future<void> _loadUserInfo() async {
     try {
-      // Example: Reading from storage
       String? name = await storage.read(key: 'user_name');
       String? email = await storage.read(key: 'user_email');
 
@@ -34,14 +34,11 @@ class _ProfilePageState extends State<ProfilePage> {
           userEmail = email;
         });
       } else {
-        // Optional: fetch from API
         String? accessToken = await storage.read(key: 'access_token');
         if (accessToken != null) {
           final response = await http.get(
-            Uri.parse('http://127.0.0.1:8000/profile/'), // your user API
-            headers: {
-              'Authorization': 'Bearer $accessToken',
-            },
+            Uri.parse('http://127.0.0.1:8000/profile/'),
+            headers: {'Authorization': 'Bearer $accessToken'},
           );
 
           if (response.statusCode == 200) {
@@ -51,7 +48,6 @@ class _ProfilePageState extends State<ProfilePage> {
               userEmail = data['email'] ?? 'Unknown';
             });
 
-            // Optionally store
             await storage.write(key: 'user_name', value: userName);
             await storage.write(key: 'user_email', value: userEmail);
           }
@@ -62,53 +58,38 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
-  Future<void> _logout(BuildContext context) async {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext context) {
-        return Center(child: CircularProgressIndicator());
-      },
-    );
+  Future<void> logout(BuildContext context) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? refreshToken = prefs.getString('refresh_token');
 
-    String? refreshToken = await storage.read(key: 'refresh_token');
-    if (refreshToken == null) {
-      Navigator.pop(context);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('No refresh token found')),
-      );
-      return;
-    }
+    if (refreshToken != null) {
+      final url =
+          Uri.parse('http://127.0.0.1:8000/logout/'); // Update if needed
 
-    try {
       final response = await http.post(
-        Uri.parse('http://127.0.0.1:8000/logout/'),
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $refreshToken',
-        },
+        url,
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode({'refresh': refreshToken}),
       );
-
-      Navigator.pop(context);
 
       if (response.statusCode == 200) {
-        await storage.deleteAll();
+        await prefs.remove('access_token');
+        await prefs.remove('refresh_token');
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Logged out successfully")),
+        );
+
+        // Navigate to bottom page
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => LoginPage()),
+          MaterialPageRoute(builder: (context) => MyHomePage()),
         );
       } else {
-        final responseBody = json.decode(response.body);
-        String errorMessage = responseBody['error'] ?? 'Error logging out';
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(errorMessage)),
+          SnackBar(content: Text("Logout failed")),
         );
       }
-    } catch (e) {
-      Navigator.pop(context);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error occurred: ${e.toString()}')),
-      );
     }
   }
 
@@ -164,7 +145,7 @@ class _ProfilePageState extends State<ProfilePage> {
           _buildProfileOption(
             context,
             icon: Icons.person,
-            text: "Edit Profile",
+            text: "Мэдээлэл засах",
             onTap: () {
               Navigator.push(
                 context,
@@ -174,18 +155,29 @@ class _ProfilePageState extends State<ProfilePage> {
           ),
           _buildProfileOption(
             context,
-            icon: Icons.settings,
-            text: "Settings",
+            icon: Icons.history,
+            text: "Хэрэглэгчийн түүх",
             onTap: () {
-              // Implement settings page
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => HistoryPage()),
+              );
+            },
+          ),
+          _buildProfileOption(
+            context,
+            icon: Icons.settings,
+            text: "Тохиргоо",
+            onTap: () {
+              // Future settings implementation
             },
           ),
           _buildProfileOption(
             context,
             icon: Icons.logout,
-            text: "Logout",
+            text: "Гарах",
             onTap: () {
-              _logout(context);
+              logout(context);
             },
           ),
         ],

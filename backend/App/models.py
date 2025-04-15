@@ -88,8 +88,9 @@ class Worker(models.Model):
     wfirst = models.CharField(max_length=255, verbose_name="Worker First Name")
     wname = models.CharField(max_length=255, verbose_name="Worker Last Name")
     wphone = models.CharField(max_length=15, unique=True, verbose_name="Worker Phone")
-    role = models.ForeignKey(Role, on_delete=models.CASCADE, related_name="workers", verbose_name="Role")
-    branch = models.ForeignKey(Branch, null=True, blank=True, on_delete=models.SET_NULL, related_name="workers", verbose_name="Branch")
+    role = models.ForeignKey('Role', on_delete=models.CASCADE, related_name="workers", verbose_name="Role")
+    branch = models.ForeignKey('Branch', null=True, blank=True, on_delete=models.SET_NULL, related_name="workers", verbose_name="Branch")
+    worker_image = models.ImageField(upload_to='worker_images/', null=True, blank=True, verbose_name="Worker Image")
 
     class Meta:
         db_table = "t_worker"
@@ -98,6 +99,7 @@ class Worker(models.Model):
 
     def __str__(self):
         return f"{self.wfirst} {self.wname}"
+
 
 # Service Category Model
 class ServiceCategory(models.Model):
@@ -121,7 +123,7 @@ class Service(models.Model):
     sname = models.CharField(max_length=255, verbose_name="Service Name")
     sprice = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Service Price")
     sduration = models.CharField(max_length=255, unique=True, verbose_name="Duration")
-    simage = models.ImageField(upload_to='media/media/meia/images/', null=True, blank=True, verbose_name="Service Image")
+    simage = models.ImageField(upload_to='service_images/', null=True, blank=True, verbose_name="Service Image")
     scomment = models.TextField(null=True, blank=True, verbose_name="Comment")
     category = models.ForeignKey(ServiceCategory, on_delete=models.SET_NULL, null=True, blank=True, related_name="services", verbose_name="Category")
 
@@ -153,4 +155,23 @@ class CalendarEvent(models.Model):
         ordering = ['start_time']
 
     def __str__(self):
-        return self.description
+        return self.description or f"Event on {self.start_time.strftime('%Y-%m-%d %H:%M')}"
+    
+
+class Made(models.Model):
+    made_id = models.AutoField(primary_key=True)
+    made_image = models.ImageField(upload_to='made_images/')
+    made_worker = models.ForeignKey(Worker, on_delete=models.CASCADE)
+    made_service_category = models.ForeignKey(ServiceCategory, on_delete=models.CASCADE)
+    comment = models.TextField(blank=True, null=True)
+
+    class Meta:
+        db_table = "t_made"
+        verbose_name = "Made Work"
+        verbose_name_plural = "Made Works"
+        ordering = ['made_id']  # or any other field you'd like to sort by
+
+    def __str__(self):
+        return f"Made by {self.made_worker} in {self.made_service_category}"
+
+

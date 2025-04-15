@@ -3,6 +3,7 @@ from App.views import *
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
+from rest_framework_simplejwt.views import TokenRefreshView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -14,6 +15,7 @@ urlpatterns = [
     path("add_role/", add_role, name='add_role'),
     path("worker/", worker_list, name='worker'),
     path("add_worker/", add_worker, name='add_worker'),
+    path('made/worker/<int:worker_id>/', get_made_by_worker, name='get_made_by_worker'),
     path('categories/', category_list, name='category_list'),
     path('categories/add/', add_category, name='add_categories'),  
     path("service/", service_list, name='service'),
@@ -37,6 +39,8 @@ urlpatterns = [
     path('logout/', logout_customer, name='logout_customer'),
     path('api/token/', CustomerTokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('profile/', user_profile, name='user-profile'),
+    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+
     # path('service_search/', service_search, name='service_search'),
 ]
 

@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Customer, Branch, Role, Worker, Service, CalendarEvent, ServiceCategory
+from .models import Customer, Branch, Role, Worker, Service, CalendarEvent, ServiceCategory, Made
 from django.contrib.auth.admin import UserAdmin
 
 # Registering models with the admin site
@@ -10,6 +10,7 @@ admin.site.register(Worker)
 admin.site.register(ServiceCategory)
 admin.site.register(Service)
 admin.site.register(CalendarEvent)
+admin.site.register(Made)
 
 
 
