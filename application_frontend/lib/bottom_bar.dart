@@ -36,7 +36,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   final iconList = <IconData>[
     Icons.home,
-    Icons.work,
+    Icons.face,
     Icons.location_on,
     Icons.account_circle,
   ];

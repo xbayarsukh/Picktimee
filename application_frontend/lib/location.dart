@@ -47,7 +47,7 @@ class _LocationPageState extends State<LocationPage> {
         children: [
           // Curved header
           Container(
-            height: 150,
+            height: 100,
             decoration: BoxDecoration(
               color: Color.fromARGB(255, 218, 175, 249),
               borderRadius: BorderRadius.only(

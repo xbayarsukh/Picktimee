@@ -71,10 +71,9 @@ class _WorkerMadeListPageState extends State<WorkerMadeListPage> {
             else
               const Text("No image available"),
             const SizedBox(height: 8),
-            Text("👤 Worker: ${made['worker_name']}",
+            Text("👤 Артист: ${made['worker_name']}",
                 style: const TextStyle(fontWeight: FontWeight.bold)),
-            Text("💇 Service: ${made['service_category']}"),
-            Text("💬 Comment: ${made['comment'] ?? 'No comment'}"),
+            Text("💇 Үйлчилгээ: ${made['service_category']}"),
           ],
         ),
       ),
