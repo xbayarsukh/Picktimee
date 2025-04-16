@@ -457,7 +457,7 @@ from .models import ServiceCategory, Service
 
 def get_lash_services(request):
     # Corrected to filter by 'cname' instead of 'name'
-    lash_category = ServiceCategory.objects.filter(cname='lash').first()
+    lash_category = ServiceCategory.objects.filter(cname='Сормуус').first()
     if lash_category:
         services = Service.objects.filter(category=lash_category)
         # Prepare the service data
@@ -479,7 +479,7 @@ def get_lash_services(request):
 
 def get_brow_services(request):
     # Corrected to filter by 'cname' for 'brow' instead of 'lash'
-    brow_category = ServiceCategory.objects.filter(cname='brow').first()
+    brow_category = ServiceCategory.objects.filter(cname='Шивээс').first()
     if brow_category:
         services = Service.objects.filter(category=brow_category)
         # Prepare the service data
@@ -499,7 +499,7 @@ def get_brow_services(request):
 
 def get_manicure_services(request):
     # Filter by 'cname' for 'manicure'
-    manicure_category = ServiceCategory.objects.filter(cname='manicure').first()
+    manicure_category = ServiceCategory.objects.filter(cname='Маникюр').first()
     if manicure_category:
         services = Service.objects.filter(category=manicure_category)
         # Prepare the service data
@@ -518,7 +518,7 @@ def get_manicure_services(request):
 
 def get_pedicure_services(request):
     # Filter by 'cname' for 'pedicure'
-    pedicure_category = ServiceCategory.objects.filter(cname='pedicure').first()
+    pedicure_category = ServiceCategory.objects.filter(cname='Педикюр').first()
     if pedicure_category:
         services = Service.objects.filter(category=pedicure_category)
         # Prepare the service data
@@ -538,7 +538,7 @@ def get_pedicure_services(request):
 
 def get_skin_services(request):
     # Filter by 'cname' for 'skin'
-    skin_category = ServiceCategory.objects.filter(cname='skin').first()
+    skin_category = ServiceCategory.objects.filter(cname='Гоо сайхан').first()
     if skin_category:
         services = Service.objects.filter(category=skin_category)
         # Prepare the service data
@@ -558,7 +558,7 @@ def get_skin_services(request):
 
 def get_piercing_services(request):
     # Filter by 'cname' for 'piercing'
-    piercing_category = ServiceCategory.objects.filter(cname='piercing').first()
+    piercing_category = ServiceCategory.objects.filter(cname='Цоолох').first()
     if piercing_category:
         services = Service.objects.filter(category=piercing_category)
         # Prepare the service data
@@ -774,13 +774,6 @@ def delete_service(request, service_id):
     return JsonResponse({'error': 'Invalid request method'}, status=405)  # 405 for invalid method
 
 
-##################################################################################################################################################
-
-
-
-
-
-
 ##############################################################################################################################################
 
 
@@ -942,50 +935,28 @@ def get_monthly_bookings(request, worker_id):
 
 ####################################################################################################################################################
 
-# views.py
-from rest_framework_simplejwt.views import TokenObtainPairView
-from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
-from .models import Customer
-
-class CustomerTokenSerializer(TokenObtainPairSerializer):
-    @classmethod
-    def get_token(cls, user):
-        token = super().get_token(user)
-        # Add extra user info to the token payload
-        token['cname'] = user.cname
-        token['cemail'] = user.cemail
-        token['cphone'] = user.cphone  # Add phone if needed
-        return token
-
-    def validate(self, attrs):
-        data = super().validate(attrs)
-        data['cname'] = self.user.cname
-        data['cemail'] = self.user.cemail
-        data['cphone'] = self.user.cphone  # Add phone to response if needed
-        return data
-
-class CustomerTokenObtainPairView(TokenObtainPairView):
-    serializer_class = CustomerTokenSerializer
-
-
-# views.py (continued)
-from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.response import Response
-
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def user_profile(request):
-    customer = request.user
-    return Response({
-        'id': customer.customer_id,
-        'name': customer.cname,
-        'email': customer.cemail,
-        'phone': customer.cphone,
-        'image': customer.cimage.url if customer.cimage else None,
-        'blacklist': customer.blacklist,  # Add blacklist status if needed
-        'is_active': customer.is_active,  # Add active status if needed
-    })
+def customer_profile(request):
+    try:
+        customer = request.user  # Already is Customer
+        print("User:", customer)
+        print("Is authenticated:", customer.is_authenticated)
+
+        data = {
+            'customer_id': customer.customer_id,
+            'name': customer.cname,         # ✅ correct field
+            'email': customer.cemail,       # ✅ correct field
+            'phone': customer.cphone,
+            'image_url': request.build_absolute_uri(customer.cimage.url) if customer.cimage else None,
+            'blacklist': customer.blacklist,
+        }
+        return Response(data)
+    except Exception as e:
+        return Response({'error': str(e)}, status=400)
+
+
+
 
 
 ########################################################################################################################################################
