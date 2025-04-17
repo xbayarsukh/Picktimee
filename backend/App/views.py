@@ -850,9 +850,9 @@ from django.utils import timezone
 from .models import *
 
 @csrf_exempt
+@permission_classes([IsAuthenticated])
 def book_service(request):
     if request.method == "GET":
-        # Fetching branches, workers, and services
         branches = list(Branch.objects.values("branch_id", "bname"))
         workers = list(Worker.objects.values("worker_id", "wfirst"))
         services = list(Service.objects.values("service_id", "sname"))
@@ -865,22 +865,24 @@ def book_service(request):
 
     elif request.method == "POST":
         try:
-            data = json.loads(request.body)
+            # Extract customer from the authenticated user
+            user = request.user  # This will be the authenticated user
+            customer_id = user.customer_id  # Assuming the user model has customer_id field
+
+            data = request.data
             service_id = data.get("service_id")
-            customer_id = customer_id
             worker_id = data.get("worker_id")
             branch_id = data.get("branch_id")
-            date_str = data.get("date")  # Format: YYYY-MM-DD
-            time_str = data.get("time")  # Format: HH:MM AM/PM
+            date_str = data.get("date")
+            time_str = data.get("time")
 
             if not (service_id and customer_id and branch_id and date_str and time_str):
                 return JsonResponse({"error": "Missing required fields"}, status=400)
 
-            # Update this line to correctly handle AM/PM format
             start_time = datetime.strptime(f"{date_str} {time_str}", "%Y-%m-%d %I:%M %p")
-            end_time = start_time + timedelta(hours=1)  # Assuming 1-hour service duration
+            end_time = start_time + timedelta(hours=1)
 
-            # Check if the worker is already booked at that time
+            # Check if worker is booked
             if worker_id:
                 worker_booked = CalendarEvent.objects.filter(
                     worker_id=worker_id,

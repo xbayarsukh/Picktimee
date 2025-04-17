@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SelectServicePage extends StatefulWidget {
   @override
@@ -20,6 +21,7 @@ class _SelectServicePageState extends State<SelectServicePage> {
   List<Map<String, dynamic>> services = [];
 
   bool isLoading = true;
+  String? accessToken; // Define the access token variable
 
   @override
   void initState() {
@@ -125,35 +127,23 @@ class _SelectServicePageState extends State<SelectServicePage> {
                       SizedBox(height: 15),
 
                       // Ажилтан сонгох
-                      Text("Ажилтан сонгох",
-                          style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: Color.fromARGB(255, 98, 24, 158))),
-                      SizedBox(height: 10),
-                      ListView.builder(
-                        shrinkWrap: true,
-                        itemCount: workers.length,
-                        itemBuilder: (context, index) {
-                          Map<String, dynamic> worker = workers[index];
-                          bool isAvailable = worker["availability"] ==
-                              "available"; // assuming worker has an "availability" field
-
-                          return ListTile(
-                            tileColor: isAvailable
-                                ? Colors.green.withOpacity(0.2)
-                                : Colors.red.withOpacity(0.2),
-                            title: Text(
-                              worker["name"],
-                              style: TextStyle(
-                                  color: Color.fromARGB(255, 98, 24, 158)),
-                            ),
-                            onTap: () {
-                              setState(() {
-                                selectedWorker = worker["id"].toString();
-                              });
-                            },
-                          );
+                      DropdownButtonFormField<String>(
+                        decoration: _inputDecoration("Ажилтан сонгох"),
+                        value: selectedWorker,
+                        style: TextStyle(
+                          color: Color.fromARGB(255, 98, 24, 158),
+                        ),
+                        dropdownColor: Colors.white,
+                        items: workers
+                            .map((worker) => DropdownMenuItem(
+                                  value: worker["id"].toString(),
+                                  child: Text(worker["name"]),
+                                ))
+                            .toList(),
+                        onChanged: (value) {
+                          setState(() {
+                            selectedWorker = value;
+                          });
                         },
                       ),
                       SizedBox(height: 15),
@@ -310,11 +300,26 @@ class _SelectServicePageState extends State<SelectServicePage> {
       String formattedDate = DateFormat('yyyy-MM-dd').format(selectedDate!);
       String formattedTime = selectedTime!.format(context);
 
-      int customerId = 1; // Replace with actual customer ID
+      // Retrieve the JWT token and customer ID from SharedPreferences (or other storage)
+      final prefs = await SharedPreferences.getInstance();
+      String? accessToken =
+          prefs.getString('accessToken'); // Save the token after login
+      String? customer_id =
+          prefs.getString('customer_id'); // Retrieve the customer_id
+
+      if (accessToken == null || customer_id == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("User is not authenticated")),
+        );
+        return;
+      }
+
+      print('Access Token: $accessToken');
+      print('Customer ID: $customer_id');
 
       Map<String, dynamic> bookingData = {
         "service_id": int.parse(selectedService!),
-        "customer_id": customerId,
+        "customer_id": int.parse(customer_id), // Use customerId
         "worker_id": int.parse(selectedWorker!),
         "branch_id": int.parse(selectedBranch!),
         "date": formattedDate,
@@ -324,7 +329,11 @@ class _SelectServicePageState extends State<SelectServicePage> {
       try {
         final response = await http.post(
           Uri.parse("http://127.0.0.1:8000/book/"),
-          headers: {"Content-Type": "application/json"},
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization":
+                "Bearer $accessToken", // Make sure `accessToken` is correctly defined
+          },
           body: jsonEncode(bookingData),
         );
 
