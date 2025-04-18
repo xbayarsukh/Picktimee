@@ -19,7 +19,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
   Future<void> _register() async {
     if (_formKey.currentState!.validate()) {
-      String url = "http://127.0.0.1:8000/register/"; // Update if necessary
+      String url = "http://192.168.1.56:8400/register/"; // Update if necessary
 
       final response = await http.post(
         Uri.parse(url),

@@ -19,7 +19,7 @@ class _LocationPageState extends State<LocationPage> {
 
   Future<void> fetchBranches() async {
     final url =
-        Uri.parse('http://127.0.0.1:8000/branch/'); // For Android Emulator
+        Uri.parse('http://192.168.1.56:8400/branch/'); // For Android Emulator
 
     try {
       final response = await http.get(url);

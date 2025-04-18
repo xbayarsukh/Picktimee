@@ -20,8 +20,8 @@ class _LashPageState extends State<LashPage> {
 
   Future<void> fetchServices() async {
     try {
-      final response =
-          await http.get(Uri.parse('http://127.0.0.1:8000/get_lash_services/'));
+      final response = await http
+          .get(Uri.parse('http://192.168.1.56:8400/get_lash_services/'));
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         if (data['categories'] != null && data['services'] != null) {
@@ -105,7 +105,7 @@ class _LashPageState extends State<LashPage> {
                     ),
                     itemBuilder: (context, index) {
                       String imageUrl = services[index]['simage'] != null
-                          ? 'http://127.0.0.1:8000${services[index]['simage']}'
+                          ? 'http://192.168.1.56:8400${services[index]['simage']}'
                           : 'https://via.placeholder.com/150';
 
                       return Card(
@@ -159,7 +159,7 @@ class _LashPageState extends State<LashPage> {
                     itemCount: services.length,
                     itemBuilder: (context, index) {
                       String imageUrl = services[index]['simage'] != null
-                          ? 'http://127.0.0.1:8000${services[index]['simage']}'
+                          ? 'http://192.168.1.56:8400${services[index]['simage']}'
                           : 'https://via.placeholder.com/180';
 
                       return Card(

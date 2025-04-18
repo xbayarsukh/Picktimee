@@ -21,7 +21,7 @@ class _WorkerPageState extends State<WorkerPage> {
   Future<void> fetchWorkers() async {
     try {
       final response =
-          await http.get(Uri.parse('http://127.0.0.1:8000/worker/'));
+          await http.get(Uri.parse('http://192.168.1.56:8400/worker/'));
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         setState(() {
@@ -76,7 +76,7 @@ class _WorkerPageState extends State<WorkerPage> {
                     ),
                     itemBuilder: (context, index) {
                       String imageUrl = workers[index]['worker_image'] != null
-                          ? 'http://127.0.0.1:8000${workers[index]['worker_image']}'
+                          ? 'http://192.168.1.56:8400${workers[index]['worker_image']}'
                           : 'https://via.placeholder.com/150';
 
                       return GestureDetector(
@@ -142,7 +142,7 @@ class _WorkerPageState extends State<WorkerPage> {
                     itemCount: workers.length,
                     itemBuilder: (context, index) {
                       String imageUrl = workers[index]['worker_image'] != null
-                          ? 'http://127.0.0.1:8000${workers[index]['worker_image']}'
+                          ? 'http://192.168.1.56:8400${workers[index]['worker_image']}'
                           : 'https://via.placeholder.com/180';
 
                       return Card(

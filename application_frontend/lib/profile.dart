@@ -37,7 +37,7 @@ class _ProfilePageState extends State<ProfilePage> {
         String? accessToken = await storage.read(key: 'access_token');
         if (accessToken != null) {
           final response = await http.get(
-            Uri.parse('http://127.0.0.1:8000/profile/'),
+            Uri.parse('http://192.168.1.56:8400/profile/'),
             headers: {'Authorization': 'Bearer $accessToken'},
           );
 
@@ -64,7 +64,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
     if (refreshToken != null) {
       final url =
-          Uri.parse('http://127.0.0.1:8000/logout/'); // Update if needed
+          Uri.parse('http://192.168.1.56:8400/logout/'); // Update if needed
 
       final response = await http.post(
         url,

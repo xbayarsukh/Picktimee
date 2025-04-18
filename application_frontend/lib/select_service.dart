@@ -31,7 +31,8 @@ class _SelectServicePageState extends State<SelectServicePage> {
 
   Future<void> fetchData() async {
     try {
-      final response = await http.get(Uri.parse("http://127.0.0.1:8000/book/"));
+      final response =
+          await http.get(Uri.parse("http://192.168.1.56:8400/book/"));
 
       if (response.statusCode == 200) {
         var data = jsonDecode(response.body);
@@ -328,7 +329,7 @@ class _SelectServicePageState extends State<SelectServicePage> {
 
       try {
         final response = await http.post(
-          Uri.parse("http://127.0.0.1:8000/book/"),
+          Uri.parse("http://192.168.1.56:8400/book/"),
           headers: {
             "Content-Type": "application/json",
             "Authorization":

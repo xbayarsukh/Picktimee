@@ -20,8 +20,8 @@ class _SkincarePageState extends State<SkincarePage> {
 
   Future<void> fetchSkincareServices() async {
     try {
-      final response =
-          await http.get(Uri.parse('http://127.0.0.1:8000/get_skin_services/'));
+      final response = await http
+          .get(Uri.parse('http://192.168.1.56:8400/get_skin_services/'));
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         if (data['categories'] != null && data['services'] != null) {
@@ -109,7 +109,7 @@ class _SkincarePageState extends State<SkincarePage> {
                     itemBuilder: (context, index) {
                       String imageUrl = skincareServices[index]['simage'] !=
                               null
-                          ? 'http://127.0.0.1:8000${skincareServices[index]['simage']}'
+                          ? 'http://192.168.1.56:8400${skincareServices[index]['simage']}'
                           : 'https://via.placeholder.com/150';
 
                       return Card(
@@ -164,7 +164,7 @@ class _SkincarePageState extends State<SkincarePage> {
                     itemBuilder: (context, index) {
                       String imageUrl = skincareServices[index]['simage'] !=
                               null
-                          ? 'http://127.0.0.1:8000${skincareServices[index]['simage']}'
+                          ? 'http://192.168.1.56:8400${skincareServices[index]['simage']}'
                           : 'https://via.placeholder.com/180';
 
                       return Card(

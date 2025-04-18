@@ -20,8 +20,8 @@ class _BrowPageState extends State<BrowPage> {
 
   Future<void> fetchBrowServices() async {
     try {
-      final response =
-          await http.get(Uri.parse('http://127.0.0.1:8000/get_brow_services/'));
+      final response = await http
+          .get(Uri.parse('http://192.168.1.56:8400/get_brow_services/'));
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         if (data['categories'] != null && data['services'] != null) {
@@ -108,7 +108,7 @@ class _BrowPageState extends State<BrowPage> {
                     ),
                     itemBuilder: (context, index) {
                       String imageUrl = browServices[index]['simage'] != null
-                          ? 'http://127.0.0.1:8000${browServices[index]['simage']}'
+                          ? 'http://192.168.1.56:8400${browServices[index]['simage']}'
                           : 'https://via.placeholder.com/150';
 
                       return Card(
@@ -162,7 +162,7 @@ class _BrowPageState extends State<BrowPage> {
                     itemCount: browServices.length,
                     itemBuilder: (context, index) {
                       String imageUrl = browServices[index]['simage'] != null
-                          ? 'http://127.0.0.1:8000${browServices[index]['simage']}'
+                          ? 'http://192.168.1.56:8400${browServices[index]['simage']}'
                           : 'https://via.placeholder.com/180';
 
                       return Card(

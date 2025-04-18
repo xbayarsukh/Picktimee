@@ -25,7 +25,7 @@ class _WorkerMadeListPageState extends State<WorkerMadeListPage> {
   Future<void> fetchMadeByWorker() async {
     // Use your machine's IP address if testing on a real device
     final url =
-        Uri.parse('http://127.0.0.1:8000/made/worker/${widget.workerId}/');
+        Uri.parse('http://192.168.1.56:8400/made/worker/${widget.workerId}/');
 
     try {
       final response = await http.get(url);
