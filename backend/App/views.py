@@ -7,6 +7,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.http import JsonResponse
+from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.db import connection
 from .serializers import CalendarEventSerializer
@@ -19,6 +20,9 @@ from django.contrib.auth import get_user_model
 
 
 Customer = get_user_model()
+
+def home(request):
+    return HttpResponse("Welcome to the homepage!")
 
 @csrf_exempt
 def register_customer(request):
@@ -46,28 +50,30 @@ def register_customer(request):
 
 
 @csrf_exempt
+@api_view(['POST'])
 def login_customer(request):
-    if request.method == 'POST':
-        data = json.loads(request.body)
-        cemail = data.get('cemail')
-        password = data.get('password')
+    cemail = request.data.get('cemail')
+    password = request.data.get('password')
 
-        try:
-            customer = Customer.objects.get(cemail=cemail)
-        except Customer.DoesNotExist:
-            return JsonResponse({'error': 'Invalid email or password'}, status=400)
+    try:
+        customer = Customer.objects.get(cemail=cemail)
+    except Customer.DoesNotExist:
+        return Response({'error': 'Invalid email or password'}, status=status.HTTP_400_BAD_REQUEST)
 
-        if customer.check_password(password):
-            # Manually creating a refresh token and setting the correct user ID field
-            refresh = RefreshToken.for_user(customer)
+    if customer.check_password(password):
+        refresh = RefreshToken.for_user(customer)
 
-            # Explicitly add 'customer_id' to the payload to override the default 'id'
-            refresh.payload['user_id'] = customer.customer_id
-
-            # Return token information
-            return JsonResponse({'access': str(refresh.access_token),'refresh': str(refresh)})
-        else:
-            return JsonResponse({'error': 'Invalid email or password'}, status=400)
+        return Response({
+            'access': str(refresh.access_token),
+            'refresh': str(refresh),
+            'user': {
+                'id': customer.customer_id,
+                'email': customer.cemail,
+                'name': customer.cname,
+            }
+        })
+    else:
+        return Response({'error': 'Invalid email or password'}, status=status.HTTP_400_BAD_REQUEST)
 
 
 

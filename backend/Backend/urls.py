@@ -6,6 +6,7 @@ from django.contrib import admin
 from rest_framework_simplejwt.views import TokenRefreshView
 
 urlpatterns = [
+    path('', home, name='home'),
     path('admin/', admin.site.urls),
     path("customer/", customer_list, name='customer'),
     path("add_customer/", add_customer, name='add_customer'),
