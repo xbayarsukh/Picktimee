@@ -24,7 +24,7 @@ SECRET_KEY = 'django-insecure-x1m9qh9tf-8^=f5hl)7n7bbq6do6)zm4ucj&@f4*^5zsf8z%f#
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['192.168.1.56','localhost','127.0.0.1']
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -94,9 +94,9 @@ WSGI_APPLICATION = 'Backend.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',  # Or your preferred backend
-        'NAME': 'time_order',
+        'NAME': 'picktime',
         'USER': 'postgres',
-        'PASSWORD': '1004',
+        'PASSWORD': '12345679',
         'HOST': 'localhost',
         'PORT': '5432',
     }
